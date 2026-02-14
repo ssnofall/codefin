@@ -3,11 +3,12 @@
 import { useTheme } from './ThemeProvider';
 
 const COLORS = [
-  { name: 'green', label: 'Green', light: '#22c55e', dark: '#4ade80' },
+  { name: 'green',  label: 'Green',  light: '#22c55e', dark: '#4ade80' },
   { name: 'orange', label: 'Orange', light: '#f97316', dark: '#fb923c' },
-  { name: 'blue', label: 'Blue', light: '#3b82f6', dark: '#60a5fa' },
-  { name: 'pink', label: 'Pink', light: '#ec4899', dark: '#f472b6' },
+  { name: 'blue',   label: 'Blue',   light: '#3b82f6', dark: '#60a5fa' },
+  { name: 'pink',   label: 'Pink',   light: '#ec4899', dark: '#f472b6' },
 ] as const;
+
 
 export function ColorThemePicker() {
   const { accentColor, setAccentColor, theme } = useTheme();
