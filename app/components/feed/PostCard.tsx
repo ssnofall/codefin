@@ -7,7 +7,7 @@ import { Tag } from '../ui/Tag';
 import { VoteButtons } from '../post/VoteButtons';
 import { PostMenu } from '../post/PostMenu';
 import { formatDate } from '../../lib/utils/formatters';
-import { CODE_PREVIEW_LINES } from '../../lib/utils/constants';
+import { CODE_PREVIEW_LINES, getLanguageColor } from '../../lib/utils/constants';
 import { CodePreview } from '../post/CodePreview';
 
 interface PostCardProps {
@@ -22,7 +22,6 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
-  const score = post.upvotes - post.downvotes;
   const codeLines = post.code.split('\n');
   const shouldTruncate = codeLines.length > CODE_PREVIEW_LINES;
   const previewCode = shouldTruncate
@@ -33,16 +32,8 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
 
   return (
     <Card className="group p-3 sm:p-5">
-      {/* Desktop Layout: Vertical votes on left */}
-      <div className="hidden lg:flex gap-4">
-        {/* Vote Buttons - Desktop (Vertical) */}
-        <VoteButtons 
-          postId={post.id} 
-          score={score} 
-          orientation="vertical" 
-          initialUserVote={userVote}
-        />
-
+      {/* Desktop Layout */}
+      <div className="hidden lg:block">
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Header */}
@@ -76,26 +67,10 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
             </h3>
           </Link>
 
-          {/* Code Preview */}
-          <Link href={`/post/${post.id}`} className="block mb-4">
-            <CodePreview code={previewCode} language={post.language} fileName={post.file_name} />
-            {shouldTruncate && (
-              <p className="text-sm text-muted-foreground mt-2 text-center">
-                Click to see full code
-              </p>
-            )}
-          </Link>
-
-          {/* Footer */}
-          <div className="flex items-center gap-4">
-            {/* Language Badge */}
-            <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              {post.language}
-            </span>
-
-            {/* Tags */}
+          {/* Tags - below title, above code */}
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
             {post.tags && post.tags.length > 0 && (
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap flex-1">
                 {post.tags.slice(0, 3).map((tag) => (
                   <Tag key={tag} name={tag} />
                 ))}
@@ -107,12 +82,37 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
               </div>
             )}
 
+            {/* Language Badge - far right */}
+            <span className={`px-2.5 py-1 rounded-md text-xs font-medium border ${getLanguageColor(post.language)}`}>
+              {post.language}
+            </span>
+          </div>
+
+          {/* Code Preview */}
+          <Link href={`/post/${post.id}`} className="block mb-4">
+            <CodePreview code={previewCode} language={post.language} fileName={post.file_name} />
+            {shouldTruncate && (
+              <p className="text-sm text-muted-foreground mt-2 text-center">
+                Click to see full code
+              </p>
+            )}
+          </Link>
+
+          {/* Footer: Vote Buttons & Comments - bottom left */}
+          <div className="flex items-center gap-1">
+            <VoteButtons
+              postId={post.id}
+              upvotes={post.upvotes}
+              downvotes={post.downvotes}
+              initialUserVote={userVote}
+            />
+
             {/* Comments */}
             <Link
               href={`/post/${post.id}`}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors ml-auto"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
             >
-              <MessageSquare className="w-4 h-4" />
+              <MessageSquare className="w-3 h-3" />
               <span>Comments</span>
             </Link>
           </div>
@@ -152,6 +152,26 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
           </h3>
         </Link>
 
+        {/* Tags - below title, above code */}
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
+          {/* Tags - Mobile: Show only first tag */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex items-center gap-1 flex-1">
+              <Tag name={post.tags[0]} />
+              {post.tags.length > 1 && (
+                <span className="text-xs text-muted-foreground">
+                  +{post.tags.length - 1}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Language Badge - far right */}
+          <span className={`px-2 py-0.5 rounded-md text-xs font-medium border ${getLanguageColor(post.language)}`}>
+            {post.language}
+          </span>
+        </div>
+
         {/* Code Preview */}
         <Link href={`/post/${post.id}`} className="block mb-3">
           <CodePreview code={previewCode} language={post.language} fileName={post.file_name} />
@@ -162,46 +182,23 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
           )}
         </Link>
 
-        {/* Footer Row */}
-        <div className="flex items-center justify-between gap-2">
-          {/* Left side: Language + Tags */}
-          <div className="flex items-center gap-2 min-w-0">
-            {/* Language Badge */}
-            <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0">
-              {post.language}
-            </span>
-
-            {/* Tags - Mobile: Show only first tag */}
-            {post.tags && post.tags.length > 0 && (
-              <div className="flex items-center gap-1">
-                <Tag name={post.tags[0]} />
-                {post.tags.length > 1 && (
-                  <span className="text-xs text-muted-foreground">
-                    +{post.tags.length - 1}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Comments Link */}
-          <Link
-            href={`/post/${post.id}`}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0"
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>Comments</span>
-          </Link>
-        </div>
-
-        {/* Vote Buttons - Mobile (Horizontal) */}
-        <div className="mt-3 pt-3 border-t border-border/50">
-          <VoteButtons 
-            postId={post.id} 
-            score={score} 
-            orientation="horizontal" 
+        {/* Footer: Vote Buttons & Comments - bottom left */}
+        <div className="flex items-center gap-1">
+          <VoteButtons
+            postId={post.id}
+            upvotes={post.upvotes}
+            downvotes={post.downvotes}
             initialUserVote={userVote}
           />
+
+          {/* Comments */}
+          <Link
+            href={`/post/${post.id}`}
+            className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+          >
+            <MessageSquare className="w-3 h-3" />
+            <span>Comments</span>
+          </Link>
         </div>
       </div>
     </Card>

@@ -64,3 +64,28 @@ export const SORT_OPTIONS = [
   { label: 'New', value: 'new' },
   { label: 'Top', value: 'top' },
 ] as const
+
+// Language colors mapping
+export const LANGUAGE_COLORS: Record<string, string> = {
+  javascript: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20',
+  typescript: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+  python: 'bg-green-500/10 text-green-600 border-green-500/20',
+  go: 'bg-cyan-500/10 text-cyan-600 border-cyan-500/20',
+  rust: 'bg-orange-500/10 text-orange-600 border-orange-500/20',
+  java: 'bg-red-500/10 text-red-600 border-red-500/20',
+  'c++': 'bg-purple-500/10 text-purple-600 border-purple-500/20',
+  'c#': 'bg-violet-500/10 text-violet-600 border-violet-500/20',
+  ruby: 'bg-red-500/10 text-red-600 border-red-500/20',
+  php: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
+  swift: 'bg-orange-500/10 text-orange-600 border-orange-500/20',
+  kotlin: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
+  html: 'bg-orange-500/10 text-orange-600 border-orange-500/20',
+  css: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+  sql: 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20',
+  shell: 'bg-green-500/10 text-green-600 border-green-500/20',
+  other: 'bg-muted text-muted-foreground border-border',
+}
+
+export function getLanguageColor(language: string): string {
+  return LANGUAGE_COLORS[language.toLowerCase()] || LANGUAGE_COLORS.other
+}

@@ -15,7 +15,7 @@ import { CodePreview } from '../../components/post/CodePreview';
 import { CommentSection } from '../../components/post/CommentSection';
 import { CommentItem } from '../../components/post/CommentItem';
 import { formatDate } from '../../lib/utils/formatters';
-import { SCORE_LABEL } from '../../lib/utils/constants';
+import { getLanguageColor } from '../../lib/utils/constants';
 import { Tables } from '../../lib/supabase/types';
 
 interface PostPageProps {
@@ -53,7 +53,6 @@ export default async function PostPage({ params }: PostPageProps) {
     const p = post as Tables<'posts'> & {
       profiles: { username: string; avatar_url: string } | null;
     };
-    const score = p.upvotes - p.downvotes;
 
     // Get user's vote for this specific post
     const userVote = user ? await getUserVote(id) : null;
@@ -72,15 +71,7 @@ export default async function PostPage({ params }: PostPageProps) {
         {/* Post */}
         <Card className="p-3 sm:p-5">
           {/* Desktop Layout */}
-          <div className="hidden lg:flex gap-4">
-            {/* Vote Buttons - Desktop */}
-            <VoteButtons 
-              postId={p.id} 
-              score={score} 
-              orientation="vertical" 
-              initialUserVote={userVote}
-            />
-
+          <div className="hidden lg:block">
             {/* Content */}
             <div className="flex-1 min-w-0">
               {/* Header */}
@@ -113,39 +104,44 @@ export default async function PostPage({ params }: PostPageProps) {
               {/* Title */}
               <h1 className="text-2xl font-bold mb-4">{p.title}</h1>
 
-              {/* Code */}
-              <div className="mb-6">
-                <CodePreview code={p.code} language={p.language} fileName={p.file_name} />
-              </div>
-
-              {/* Footer */}
-              <div className="flex items-center gap-4 flex-wrap">
-                {/* Language Badge */}
-                <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  {p.language}
-                </span>
-
+              {/* Tags - below title, above code */}
+              <div className="flex items-center gap-2 mb-4 flex-wrap">
                 {/* Tags */}
                 {p.tags && p.tags.length > 0 && (
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap flex-1">
                     {p.tags.map((tag) => (
                       <Tag key={tag} name={tag} />
                     ))}
                   </div>
                 )}
 
-                {/* Stats */}
-                <div className="flex items-center gap-4 ml-auto text-sm text-muted-foreground">
-                  <span>
-                    {SCORE_LABEL}: {score}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <MessageSquare className="w-4 h-4" />
-                    <Suspense fallback={<span>Loading...</span>}>
-                      <CommentCount postId={id} />
-                    </Suspense>
-                  </span>
-                </div>
+                {/* Language Badge - far right */}
+                <span className={`px-2.5 py-1 rounded-md text-xs font-medium border ${getLanguageColor(p.language)}`}>
+                  {p.language}
+                </span>
+              </div>
+
+              {/* Code */}
+              <div className="mb-4">
+                <CodePreview code={p.code} language={p.language} fileName={p.file_name} />
+              </div>
+
+              {/* Footer: Vote Buttons & Comments - bottom left */}
+              <div className="flex items-center gap-1">
+                <VoteButtons
+                  postId={p.id}
+                  upvotes={p.upvotes}
+                  downvotes={p.downvotes}
+                  initialUserVote={userVote}
+                />
+
+                {/* Comments */}
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground">
+                  <MessageSquare className="w-3 h-3" />
+                  <Suspense fallback={<span>...</span>}>
+                    <CommentCount postId={id} />
+                  </Suspense>
+                </span>
               </div>
             </div>
           </div>
@@ -182,51 +178,49 @@ export default async function PostPage({ params }: PostPageProps) {
             {/* Title */}
             <h1 className="text-lg sm:text-xl font-bold mb-3">{p.title}</h1>
 
+            {/* Tags - below title, above code */}
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
+              {/* Tags - Show first 2 on mobile */}
+              {p.tags && p.tags.length > 0 && (
+                <div className="flex items-center gap-1 flex-1">
+                  {p.tags.slice(0, 2).map((tag) => (
+                    <Tag key={tag} name={tag} />
+                  ))}
+                  {p.tags.length > 2 && (
+                    <span className="text-xs text-muted-foreground">
+                      +{p.tags.length - 2}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Language Badge - far right */}
+              <span className={`px-2 py-0.5 rounded-md text-xs font-medium border ${getLanguageColor(p.language)}`}>
+                {p.language}
+              </span>
+            </div>
+
             {/* Code */}
             <div className="mb-4">
               <CodePreview code={p.code} language={p.language} fileName={p.file_name} />
             </div>
 
-            {/* Footer */}
-            <div className="flex items-center justify-between gap-2 mb-3">
-              <div className="flex items-center gap-2 flex-wrap">
-                {/* Language Badge */}
-                <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  {p.language}
-                </span>
+            {/* Footer: Vote Buttons & Comments - bottom left */}
+            <div className="flex items-center gap-1">
+              <VoteButtons
+                postId={p.id}
+                upvotes={p.upvotes}
+                downvotes={p.downvotes}
+                initialUserVote={userVote}
+              />
 
-                {/* Tags - Show first 2 on mobile */}
-                {p.tags && p.tags.length > 0 && (
-                  <div className="flex items-center gap-1">
-                    {p.tags.slice(0, 2).map((tag) => (
-                      <Tag key={tag} name={tag} />
-                    ))}
-                    {p.tags.length > 2 && (
-                      <span className="text-xs text-muted-foreground">
-                        +{p.tags.length - 2}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Comment Count */}
-              <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-                <MessageSquare className="w-3.5 h-3.5" />
-                <Suspense fallback={<span>Loading...</span>}>
+              {/* Comments */}
+              <span className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground">
+                <MessageSquare className="w-3 h-3" />
+                <Suspense fallback={<span>...</span>}>
                   <CommentCount postId={id} />
                 </Suspense>
               </span>
-            </div>
-
-            {/* Vote Buttons - Mobile */}
-            <div className="pt-3 border-t border-border/50">
-              <VoteButtons 
-                postId={p.id} 
-                score={score} 
-                orientation="horizontal" 
-                initialUserVote={userVote}
-              />
             </div>
           </div>
         </Card>
