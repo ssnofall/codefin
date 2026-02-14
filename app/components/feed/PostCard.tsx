@@ -89,14 +89,16 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
           </div>
 
           {/* Code Preview */}
-          <Link href={`/post/${post.id}`} className="block mb-4">
+          <div className="block mb-4">
             <CodePreview code={previewCode} language={post.language} fileName={post.file_name} />
             {shouldTruncate && (
-              <p className="text-sm text-muted-foreground mt-2 text-center">
-                Click to see full code
-              </p>
+              <Link href={`/post/${post.id}`}>
+                <p className="text-sm text-muted-foreground mt-2 text-center">
+                  Click to see full code
+                </p>
+              </Link>
             )}
-          </Link>
+          </div>
 
           {/* Footer: Vote Buttons & Comments - bottom left */}
           <div className="flex items-center gap-1">
@@ -173,14 +175,16 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
         </div>
 
         {/* Code Preview */}
-        <Link href={`/post/${post.id}`} className="block mb-3">
+        <div className="block mb-3">
           <CodePreview code={previewCode} language={post.language} fileName={post.file_name} />
           {shouldTruncate && (
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              Tap to see full code →
-            </p>
+            <Link href={`/post/${post.id}`}>
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Tap to see full code →
+              </p>
+            </Link>
           )}
-        </Link>
+        </div>
 
         {/* Footer: Vote Buttons & Comments - bottom left */}
         <div className="flex items-center gap-1">
