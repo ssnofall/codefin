@@ -1,5 +1,6 @@
 import { createClient } from '../../lib/supabase/server';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { Card } from '../../components/ui/Card';
 import { APP_NAME } from '../../lib/utils/constants';
 import { Github } from 'lucide-react';
@@ -56,7 +57,15 @@ export default async function LoginPage() {
           </form>
 
           <p className="text-sm text-muted-foreground">
-            By signing in, you agree to our Terms of Service and Privacy Policy.
+            By signing in, you agree to our{' '}
+            <Link href="/terms" className="underline hover:text-foreground transition-colors">
+              Terms of Service
+            </Link>
+            {' '}and{' '}
+            <Link href="/privacy" className="underline hover:text-foreground transition-colors">
+              Privacy Policy
+            </Link>
+            .
           </p>
         </div>
       </Card>

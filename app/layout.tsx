@@ -6,6 +6,7 @@ import { LeftSidebar } from "./components/layout/LeftSidebar";
 import { RightSidebar } from "./components/layout/RightSidebar";
 import { Header } from "./components/layout/Header";
 import { BottomNav } from "./components/layout/BottomNav";
+import { Footer } from "./components/layout/Footer";
 import { createClient } from "./lib/supabase/server";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 
@@ -114,6 +115,9 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <BottomNavWithUser />
           </Suspense>
+
+          {/* Footer */}
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
