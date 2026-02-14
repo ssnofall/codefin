@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stackd MVP
 
-## Getting Started
+Share Code. Get Seen.
 
-First, run the development server:
+## Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Frontend**: Next.js 14+ (App Router), TypeScript, TailwindCSS
+- **Backend**: Supabase (PostgreSQL + Auth + RLS)
+- **Auth**: GitHub OAuth via Supabase
+- **Hosting**: Vercel (Free Tier compatible)
+
+## Features
+
+- GitHub OAuth authentication
+- Create posts with title, code, language, and tags (max 5)
+- Feed with sorting (Hot, New, Top)
+- Voting system (upvote/downvote)
+- Comments (text-only, delete own)
+- Tag filtering
+- User profiles with stats
+- Syntax highlighting with Shiki
+
+## Project Structure
+
+```
+stackd/
+├── app/
+│   ├── (routes)/
+│   │   ├── feed/              # Main feed
+│   │   ├── new/               # Newest posts
+│   │   ├── top/               # Top posts
+│   │   ├── trending/          # Trending posts
+│   │   ├── saved/             # Saved posts
+│   │   ├── post/[id]/         # Post detail
+│   │   ├── profile/[username]/# Profile page
+│   │   └── create/            # Create post form
+│   ├── auth/
+│   │   ├── login/             # GitHub OAuth login
+│   │   ├── callback/          # OAuth callback
+│   │   └── logout/            # Sign out
+│   ├── components/
+│   │   ├── layout/            # Layout components
+│   │   ├── feed/              # Feed components
+│   │   ├── post/              # Post components
+│   │   ├── profile/           # Profile components
+│   │   └── ui/                # Reusable UI
+│   ├── lib/
+│   │   ├── supabase/          # Supabase clients
+│   │   ├── actions/           # Server actions
+│   │   └── utils/             # Utilities
+│   └── globals.css
+├── supabase/
+│   ├── schema.sql             # Database schema
+│   └── rls.sql                # RLS policies
+└── ...
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create `.env.local`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
 
-## Learn More
+## Database Setup
 
-To learn more about Next.js, take a look at the following resources:
+1. Create a new Supabase project
+2. Run the SQL in `supabase/schema.sql`
+3. Run the SQL in `supabase/rls.sql`
+4. Enable GitHub OAuth in Authentication > Providers
+5. Add your GitHub OAuth credentials
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Development
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Install dependencies
+npm install
 
-## Deploy on Vercel
+# Run development server
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Open [http://localhost:3000](http://localhost:3000)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment
+
+### Vercel
+
+1. Push to GitHub
+2. Import project on Vercel
+3. Add environment variables
+4. Deploy
+
+### Environment Variables for Production
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
+```
+
+## License
+
+MIT
