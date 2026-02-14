@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import { vote } from '../../lib/actions/votes';
 
@@ -20,49 +20,41 @@ export function VoteButtons({
   const [upvotes, setUpvotes] = useState(initialUpvotes);
   const [downvotes, setDownvotes] = useState(initialDownvotes);
   const [userVote, setUserVote] = useState<'up' | 'down' | null>(initialUserVote);
-  const [isPending, startTransition] = useTransition();
+  const [isVoting, setIsVoting] = useState(false);
 
-  const handleVote = (type: 'up' | 'down') => {
-    startTransition(async () => {
-      const newVote = userVote === type ? null : type;
-      
-      // Optimistic update
-      if (userVote === type) {
-        // Remove vote
-        if (type === 'up') {
-          setUpvotes(upvotes - 1);
-        } else {
-          setDownvotes(downvotes - 1);
-        }
-      } else if (userVote === null) {
-        // Add new vote
-        if (type === 'up') {
-          setUpvotes(upvotes + 1);
-        } else {
-          setDownvotes(downvotes + 1);
-        }
+  const handleVote = async (type: 'up' | 'down') => {
+    if (isVoting) return;
+    
+    setIsVoting(true);
+    const newVote = userVote === type ? null : type;
+    
+    if (userVote === type) {
+      if (type === 'up') setUpvotes(prev => prev - 1);
+      else setDownvotes(prev => prev - 1);
+    } else if (userVote === null) {
+      if (type === 'up') setUpvotes(prev => prev + 1);
+      else setDownvotes(prev => prev + 1);
+    } else {
+      if (type === 'up') {
+        setDownvotes(prev => prev - 1);
+        setUpvotes(prev => prev + 1);
       } else {
-        // Change vote - remove old, add new
-        if (type === 'up') {
-          setDownvotes(downvotes - 1);
-          setUpvotes(upvotes + 1);
-        } else {
-          setUpvotes(upvotes - 1);
-          setDownvotes(downvotes + 1);
-        }
+        setUpvotes(prev => prev - 1);
+        setDownvotes(prev => prev + 1);
       }
-      
-      setUserVote(newVote);
-      
-      try {
-        await vote(postId, newVote);
-      } catch (error) {
-        // Revert on error
-        setUpvotes(initialUpvotes);
-        setDownvotes(initialDownvotes);
-        setUserVote(initialUserVote);
-      }
-    });
+    }
+    
+    setUserVote(newVote);
+    
+    try {
+      await vote(postId, newVote);
+    } catch (error) {
+      setUpvotes(initialUpvotes);
+      setDownvotes(initialDownvotes);
+      setUserVote(initialUserVote);
+    } finally {
+      setIsVoting(false);
+    }
   };
 
   return (
@@ -70,7 +62,7 @@ export function VoteButtons({
       {/* Upvote Button */}
       <button
         onClick={() => handleVote('up')}
-        disabled={isPending}
+        disabled={isVoting}
         className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
           userVote === 'up'
             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
@@ -85,7 +77,7 @@ export function VoteButtons({
       {/* Downvote Button */}
       <button
         onClick={() => handleVote('down')}
-        disabled={isPending}
+        disabled={isVoting}
         className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
           userVote === 'down'
             ? 'bg-red-500/10 text-red-600 dark:text-red-400'
