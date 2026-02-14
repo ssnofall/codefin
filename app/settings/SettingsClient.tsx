@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { deleteAccount } from '../lib/actions/auth';
+import Link from 'next/link';
+import { deleteAccount, logout } from '../lib/actions/auth';
 import { ThemeToggle } from '../components/theme/ThemeToggle';
-import { AlertTriangle, Trash2 } from 'lucide-react';
+import { AlertTriangle, Trash2, LogOut } from 'lucide-react';
 
 interface SettingsClientProps {
   user: {
@@ -133,6 +134,36 @@ export function SettingsClient({ user, profile }: SettingsClientProps) {
               </p>
             </div>
             <ThemeToggle variant="switch" />
+          </div>
+        </div>
+      </section>
+
+      {/* Session Section */}
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">Session</h2>
+          <p className="text-sm text-muted-foreground">
+            Manage your active session
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-6">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h3 className="font-medium">Sign Out</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Sign out from your account on this device
+              </p>
+            </div>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors font-medium"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </button>
+            </form>
           </div>
         </div>
       </section>

@@ -6,6 +6,16 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 
 /**
+ * Sign out the current user
+ */
+export async function logout() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  revalidatePath('/', 'layout');
+  redirect('/feed');
+}
+
+/**
  * Delete the current user's account and all associated data
  * This is a permanent action that cannot be undone
  */

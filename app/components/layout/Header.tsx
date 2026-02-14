@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { User } from '@supabase/supabase-js';
-import { Code2, Settings } from 'lucide-react';
+import { Code2, Settings, LogOut } from 'lucide-react';
 import { APP_NAME } from '../../lib/utils/constants';
+import { logout } from '../../lib/actions/auth';
 
 interface HeaderProps {
   user: User | null;
@@ -34,6 +35,15 @@ export function Header({ user }: HeaderProps) {
               >
                 <Settings className="w-5 h-5" />
               </Link>
+              <form action={logout}>
+                <button
+                  type="submit"
+                  className="p-2 rounded-lg border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                  aria-label="Sign Out"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </form>
               <Link
                 href="/create"
                 className="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium hover:opacity-90 transition-opacity"
