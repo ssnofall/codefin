@@ -12,7 +12,7 @@ export function LanguageProgressBar({ label, percentage }: LanguageProgressBarPr
       </div>
       <div className="h-2 rounded-full bg-muted overflow-hidden">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-green-600 transition-all duration-500"
+          className="h-full rounded-full bg-primary transition-all duration-500"
           style={{ width: `${percentage}%` }}
         />
       </div>

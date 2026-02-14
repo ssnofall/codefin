@@ -89,7 +89,7 @@ export default async function PostPage({ params }: PostPageProps) {
                       className="rounded-full"
                       loading="lazy"
                     />
-                    <span className="font-medium group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                    <span className="font-medium group-hover:text-primary transition-colors">
                       {p.profiles?.username}
                     </span>
                   </Link>
@@ -163,7 +163,7 @@ export default async function PostPage({ params }: PostPageProps) {
                     className="rounded-full"
                     loading="lazy"
                   />
-                  <span className="text-sm font-medium group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
+                  <span className="text-sm font-medium group-hover:text-primary transition-colors truncate">
                     {p.profiles?.username}
                   </span>
                 </Link>

@@ -24,7 +24,7 @@ export function SortTabs({ activeSort }: SortTabsProps) {
             href={tab.href}
             className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all min-w-[60px] sm:min-w-[80px] touch-target ${
               isActive
-                ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/25'
+                ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
                 : 'text-muted-foreground hover:text-foreground hover:bg-accent'
             }`}
           >

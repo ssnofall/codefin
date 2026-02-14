@@ -112,7 +112,7 @@ export function EditPostModal({ post, isOpen, onClose }: EditPostModalProps) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Give your post a title"
-              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-colors"
             />
           </div>
 
@@ -127,7 +127,7 @@ export function EditPostModal({ post, isOpen, onClose }: EditPostModalProps) {
               required
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 appearance-none cursor-pointer text-foreground transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 appearance-none cursor-pointer text-foreground transition-colors"
             >
               <option value="" className="bg-card text-foreground">Select a language</option>
               {LANGUAGES.map((lang) => (
@@ -150,7 +150,7 @@ export function EditPostModal({ post, isOpen, onClose }: EditPostModalProps) {
               value={fileName}
               onChange={(e) => setFileName(e.target.value)}
               placeholder="e.g., main.js, App.tsx, README.md"
-              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-colors"
             />
           </div>
 
@@ -177,13 +177,13 @@ export function EditPostModal({ post, isOpen, onClose }: EditPostModalProps) {
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20"
                 >
                   #{tag}
                   <button
                     type="button"
                     onClick={() => removeTag(tag)}
-                    className="hover:text-emerald-300 transition-colors"
+                    className="hover:text-primary/70 transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -198,7 +198,7 @@ export function EditPostModal({ post, isOpen, onClose }: EditPostModalProps) {
               onKeyDown={handleAddTag}
               placeholder="Type a tag and press Enter (e.g., react, api, tutorial)"
               disabled={tags.length >= MAX_TAGS}
-              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 disabled:opacity-50 transition-colors"
             />
             <p className="text-xs text-muted-foreground">
               Press Enter or comma to add a tag
@@ -218,7 +218,7 @@ export function EditPostModal({ post, isOpen, onClose }: EditPostModalProps) {
               type="button"
               onClick={handleSave}
               disabled={isSubmitting}
-              className="px-6 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>

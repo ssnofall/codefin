@@ -35,13 +35,13 @@ export function CommentSection({ postId }: CommentSectionProps) {
           onChange={(e) => setBody(e.target.value)}
           placeholder="Add a comment..."
           rows={3}
-          className="w-full px-4 py-3 rounded-xl bg-card border border-input resize-none focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-colors"
+          className="w-full px-4 py-3 rounded-xl bg-card border border-input resize-none focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-colors"
         />
         <div className="flex justify-end">
           <button
             type="submit"
             disabled={!body.trim() || isSubmitting}
-            className="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Posting...' : 'Post Comment'}
           </button>

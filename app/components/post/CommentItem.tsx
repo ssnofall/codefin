@@ -52,7 +52,7 @@ export function CommentItem({ comment, currentUserId }: CommentItemProps) {
           <div className="flex items-center gap-2 mb-2">
             <Link
               href={`/profile/${comment.profiles?.username}`}
-              className="font-medium text-sm hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+              className="font-medium text-sm hover:text-primary transition-colors"
             >
               {comment.profiles?.username}
             </Link>

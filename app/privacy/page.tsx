@@ -183,7 +183,7 @@ export default function PrivacyPage() {
             <br />
             <a 
               href="mailto:ssnofall@proton.me" 
-              className="text-emerald-600 dark:text-emerald-400 hover:underline"
+              className="text-primary hover:underline"
             >
               ssnofall@proton.me
             </a>

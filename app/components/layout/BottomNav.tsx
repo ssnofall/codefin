@@ -58,12 +58,12 @@ export function BottomNav({ user }: BottomNavProps) {
                 className={`
                   flex items-center justify-center rounded-xl transition-all duration-200
                   ${isCreate
-                    ? 'w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-emerald-500/30'
+                    ? 'w-12 h-12 bg-primary text-primary-foreground shadow-lg shadow-primary/30'
                     : isActive
-                    ? 'text-emerald-600 dark:text-emerald-400'
+                    ? 'text-primary'
                     : 'text-muted-foreground'
                   }
-                  ${!isCreate && isActive ? 'bg-emerald-500/10' : ''}
+                  ${!isCreate && isActive ? 'bg-primary/10' : ''}
                   ${!isCreate ? 'w-10 h-10' : ''}
                 `}
               >
@@ -75,7 +75,7 @@ export function BottomNav({ user }: BottomNavProps) {
                 className={`
                   text-[10px] mt-1 font-medium transition-colors duration-200
                   ${isActive && !isCreate
-                    ? 'text-emerald-600 dark:text-emerald-400'
+                    ? 'text-primary'
                     : 'text-muted-foreground'
                   }
                 `}
@@ -85,7 +85,7 @@ export function BottomNav({ user }: BottomNavProps) {
 
               {/* Active indicator dot */}
               {isActive && !isCreate && (
-                <span className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-emerald-500" />
+                <span className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-primary" />
               )}
             </Link>
           );

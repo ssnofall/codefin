@@ -32,11 +32,11 @@ export function LeftSidebar({ user }: LeftSidebarProps) {
               href={item.href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                  ? 'bg-primary/10 text-primary border border-primary/20'
                   : 'text-muted-foreground hover:text-foreground hover:bg-accent'
               }`}
             >
-              <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
+              <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-primary' : ''}`} />
               {item.label}
             </Link>
           );
@@ -52,22 +52,22 @@ export function LeftSidebar({ user }: LeftSidebarProps) {
                 href={`/profile/${user.user_metadata?.user_name || 'me'}`}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                   pathname.startsWith('/profile')
-                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
                     : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                 }`}
               >
-                <UserIcon className={`w-5 h-5 transition-colors ${pathname.startsWith('/profile') ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
+                <UserIcon className={`w-5 h-5 transition-colors ${pathname.startsWith('/profile') ? 'text-primary' : ''}`} />
                 Profile
               </Link>
               <Link
                 href="/settings"
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                   pathname === '/settings'
-                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
                     : 'text-muted-foreground hover:text-foreground hover:bg-accent'
                 }`}
               >
-                <Settings className={`w-5 h-5 transition-colors ${pathname === '/settings' ? 'text-emerald-600 dark:text-emerald-400' : ''}`} />
+                <Settings className={`w-5 h-5 transition-colors ${pathname === '/settings' ? 'text-primary' : ''}`} />
                 Settings
               </Link>
             </nav>

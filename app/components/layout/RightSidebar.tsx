@@ -91,7 +91,7 @@ export function RightSidebar() {
       <div className="flex flex-col h-full py-4 space-y-6">
         <Card>
           <div className="flex items-center gap-2 mb-4">
-            <Code className="w-4 h-4 text-emerald-400" />
+            <Code className="w-4 h-4 text-primary" />
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               Most Used Languages
             </h3>
@@ -144,7 +144,7 @@ export function RightSidebar() {
       {/* Trending Topics */}
       <Card>
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="w-4 h-4 text-emerald-400" />
+          <TrendingUp className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
             Trending Topics
           </h3>
@@ -160,7 +160,7 @@ export function RightSidebar() {
                 <span className="text-xs font-medium text-muted-foreground w-4">
                   {index + 1}
                 </span>
-                <span className="text-sm font-medium group-hover:text-emerald-400 transition-colors">
+                <span className="text-sm font-medium group-hover:text-primary transition-colors">
                   #{tag.tag}
                 </span>
               </div>
@@ -178,7 +178,7 @@ export function RightSidebar() {
       {/* Language Distribution */}
       <Card>
         <div className="flex items-center gap-2 mb-4">
-          <BarChart3 className="w-4 h-4 text-emerald-400" />
+          <BarChart3 className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
             Languages
           </h3>

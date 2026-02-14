@@ -30,7 +30,7 @@ export default async function FeedPage({ searchParams }: FeedPageProps) {
         <h1 className="text-2xl font-bold">
           {tag ? (
             <span>
-              Posts tagged <span className="text-emerald-600 dark:text-emerald-400">#{tag}</span>
+              Posts tagged <span className="text-primary">#{tag}</span>
             </span>
           ) : (
             'Feed'

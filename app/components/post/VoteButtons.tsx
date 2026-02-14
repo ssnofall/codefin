@@ -65,8 +65,8 @@ export function VoteButtons({
         disabled={isVoting}
         className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
           userVote === 'up'
-            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-            : 'bg-muted text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400'
+            ? 'bg-primary/10 text-primary'
+            : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary'
         }`}
         aria-label="Upvote"
       >

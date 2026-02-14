@@ -48,7 +48,7 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
                   className="rounded-full"
                   loading="lazy"
                 />
-                <span className="text-sm font-medium group-hover/author:text-emerald-600 dark:group-hover/author:text-emerald-400 transition-colors">
+                <span className="text-sm font-medium group-hover/author:text-primary transition-colors">
                   {post.profiles?.username}
                 </span>
               </Link>
@@ -62,7 +62,7 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
 
           {/* Title */}
           <Link href={`/post/${post.id}`}>
-            <h3 className="text-lg font-semibold mb-3 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
+            <h3 className="text-lg font-semibold mb-3 group-hover:text-primary transition-colors line-clamp-2">
               {post.title}
             </h3>
           </Link>
@@ -112,7 +112,7 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
             {/* Comments */}
             <Link
               href={`/post/${post.id}`}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
             >
               <MessageSquare className="w-3 h-3" />
               <span>Comments</span>
@@ -135,7 +135,7 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
                 className="rounded-full"
                 loading="lazy"
               />
-              <span className="text-sm font-medium group-hover/author:text-emerald-600 dark:group-hover/author:text-emerald-400 transition-colors truncate">
+              <span className="text-sm font-medium group-hover/author:text-primary transition-colors truncate">
                 {post.profiles?.username}
               </span>
             </Link>
@@ -149,7 +149,7 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
 
         {/* Title */}
         <Link href={`/post/${post.id}`}>
-          <h3 className="text-base font-semibold mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-2">
+          <h3 className="text-base font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2">
             {post.title}
           </h3>
         </Link>
@@ -198,7 +198,7 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
           {/* Comments */}
           <Link
             href={`/post/${post.id}`}
-            className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+            className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
           >
             <MessageSquare className="w-3 h-3" />
             <span>Comments</span>

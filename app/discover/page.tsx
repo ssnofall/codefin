@@ -32,7 +32,7 @@ export default async function DiscoverPage() {
       {/* Platform Stats */}
       <Card>
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-emerald-400" />
+          <BarChart3 className="w-4 h-4 text-primary" />
           Platform Stats
         </h2>
         <div className="grid grid-cols-2 gap-4">
@@ -56,7 +56,7 @@ export default async function DiscoverPage() {
       {/* Trending Topics */}
       <Card>
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-emerald-400" />
+          <TrendingUp className="w-4 h-4 text-primary" />
           Trending Topics
         </h2>
         <div className="space-y-3">
@@ -70,7 +70,7 @@ export default async function DiscoverPage() {
                 <span className="text-xs font-medium text-muted-foreground w-6">
                   {index + 1}
                 </span>
-                <span className="text-sm font-medium group-hover:text-emerald-400 transition-colors">
+                <span className="text-sm font-medium group-hover:text-primary transition-colors">
                   #{tag.tag}
                 </span>
               </div>
@@ -93,7 +93,7 @@ export default async function DiscoverPage() {
       {/* Language Distribution */}
       <Card>
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-emerald-400" />
+          <BarChart3 className="w-4 h-4 text-primary" />
           Popular Languages
         </h2>
         <div className="space-y-4">

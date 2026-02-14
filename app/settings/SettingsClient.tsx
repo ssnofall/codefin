@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { deleteAccount, logout } from '../lib/actions/auth';
 import { ThemeToggle } from '../components/theme/ThemeToggle';
+import { ColorThemePicker } from '../components/theme/ColorThemePicker';
 import { AlertTriangle, Trash2, LogOut } from 'lucide-react';
 
 interface SettingsClientProps {
@@ -125,7 +126,8 @@ export function SettingsClient({ user, profile }: SettingsClientProps) {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6">
+        <div className="rounded-2xl border border-border bg-card p-6 space-y-6">
+          {/* Theme Toggle */}
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium">Theme</h3>
@@ -134,6 +136,19 @@ export function SettingsClient({ user, profile }: SettingsClientProps) {
               </p>
             </div>
             <ThemeToggle variant="switch" />
+          </div>
+
+          <div className="h-px bg-border" />
+
+          {/* Accent Color */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">Accent Color</h3>
+              <p className="text-sm text-muted-foreground">
+                Choose your accent color
+              </p>
+            </div>
+            <ColorThemePicker />
           </div>
         </div>
       </section>
@@ -158,7 +173,7 @@ export function SettingsClient({ user, profile }: SettingsClientProps) {
             <form action={logout}>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors font-medium"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-colors font-medium"
               >
                 <LogOut className="w-4 h-4" />
                 Sign Out

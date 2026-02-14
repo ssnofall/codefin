@@ -53,7 +53,7 @@ export function ProfilePosts({ posts, currentUserId }: ProfilePostsProps) {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="px-3 py-1.5 rounded-lg bg-card border border-input text-sm focus:outline-none focus:border-emerald-500/50"
+            className="px-3 py-1.5 rounded-lg bg-card border border-input text-sm focus:outline-none focus:border-primary/50"
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>

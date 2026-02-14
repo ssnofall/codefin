@@ -71,7 +71,7 @@ export default function CreatePostPage() {
               name="title"
               required
               placeholder="Give your post a title"
-              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-colors min-h-[44px]"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-colors min-h-[44px]"
             />
           </div>
 
@@ -88,7 +88,7 @@ export default function CreatePostPage() {
                 required
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 appearance-none cursor-pointer text-foreground transition-colors min-h-[44px]"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 appearance-none cursor-pointer text-foreground transition-colors min-h-[44px]"
               >
                 <option value="" className="bg-card text-foreground">Select a language</option>
                 {LANGUAGES.map((lang) => (
@@ -111,7 +111,7 @@ export default function CreatePostPage() {
                 value={fileName}
                 onChange={(e) => setFileName(e.target.value)}
                 placeholder="e.g., main.js"
-                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-colors min-h-[44px]"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-colors min-h-[44px]"
               />
             </div>
           </div>
@@ -141,13 +141,13 @@ export default function CreatePostPage() {
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20"
                 >
                   #{tag}
                   <button
                     type="button"
                     onClick={() => removeTag(tag)}
-                    className="hover:text-emerald-300 transition-colors touch-target min-w-[20px] min-h-[20px] flex items-center justify-center"
+                    className="hover:text-primary/70 transition-colors touch-target min-w-[20px] min-h-[20px] flex items-center justify-center"
                   >
                     ×
                   </button>
@@ -162,7 +162,7 @@ export default function CreatePostPage() {
               onKeyDown={handleAddTag}
               placeholder="Type a tag and press Enter"
               disabled={tags.length >= MAX_TAGS}
-              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 transition-colors min-h-[44px]"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 disabled:opacity-50 transition-colors min-h-[44px]"
             />
             <p className="text-xs text-muted-foreground">
               Press Enter or comma to add a tag
@@ -181,7 +181,7 @@ export default function CreatePostPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:w-auto px-6 py-3 sm:py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+              className="w-full sm:w-auto px-6 py-3 sm:py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
             >
               {isSubmitting ? 'Creating...' : 'Create Post'}
             </button>
