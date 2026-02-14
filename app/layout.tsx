@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import { LeftSidebar } from "./components/layout/LeftSidebar";
 import { RightSidebar } from "./components/layout/RightSidebar";
 import { Header } from "./components/layout/Header";
+import { BottomNav } from "./components/layout/BottomNav";
 import { createClient } from "./lib/supabase/server";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 
@@ -19,6 +20,16 @@ export const metadata: Metadata = {
   description: "Share code snippets and get discovered by the community",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
+};
+
 // Async wrapper components for Suspense boundaries
 async function HeaderWithUser() {
   const supabase = await createClient();
@@ -30,6 +41,12 @@ async function LeftSidebarWithUser() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   return <LeftSidebar user={user} />;
+}
+
+async function BottomNavWithUser() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  return <BottomNav user={user} />;
 }
 
 export default function RootLayout({
@@ -71,8 +88,8 @@ export default function RootLayout({
             <HeaderWithUser />
           </Suspense>
           <div className="pt-16">
-            <div className="max-w-[1320px] mx-auto px-4">
-              <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_300px] gap-6">
+            <div className="max-w-[1320px] mx-auto px-3 sm:px-4">
+              <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_300px] gap-4 lg:gap-6">
                 {/* Left Sidebar - Desktop Only */}
                 <aside className="hidden lg:block lg:sticky lg:top-20 lg:h-[calc(100vh-6rem)]">
                   <Suspense fallback={<LeftSidebarSkeleton />}>
@@ -81,7 +98,7 @@ export default function RootLayout({
                 </aside>
 
                 {/* Center Column */}
-                <main className="min-w-0 max-w-3xl mx-auto w-full">
+                <main className="min-w-0 max-w-3xl mx-auto w-full pb-24 lg:pb-6">
                   {children}
                 </main>
 
@@ -92,6 +109,11 @@ export default function RootLayout({
               </div>
             </div>
           </div>
+
+          {/* Mobile Bottom Navigation */}
+          <Suspense fallback={null}>
+            <BottomNavWithUser />
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

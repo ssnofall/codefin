@@ -59,7 +59,7 @@ export default async function PostPage({ params }: PostPageProps) {
     const userVote = user ? await getUserVote(id) : null;
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Back Button */}
         <Link
           href="/feed"
@@ -70,9 +70,10 @@ export default async function PostPage({ params }: PostPageProps) {
         </Link>
 
         {/* Post */}
-        <Card>
-          <div className="flex gap-4">
-            {/* Vote Buttons */}
+        <Card className="p-3 sm:p-5">
+          {/* Desktop Layout */}
+          <div className="hidden lg:flex gap-4">
+            {/* Vote Buttons - Desktop */}
             <VoteButtons 
               postId={p.id} 
               score={score} 
@@ -148,11 +149,91 @@ export default async function PostPage({ params }: PostPageProps) {
               </div>
             </div>
           </div>
+
+          {/* Mobile Layout */}
+          <div className="lg:hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <Link
+                  href={`/profile/${p.profiles?.username}`}
+                  className="flex items-center gap-2 group shrink-0"
+                >
+                  <Image
+                    src={p.profiles?.avatar_url || '/default-avatar.png'}
+                    alt={p.profiles?.username || 'User'}
+                    width={28}
+                    height={28}
+                    className="rounded-full"
+                    loading="lazy"
+                  />
+                  <span className="text-sm font-medium group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
+                    {p.profiles?.username}
+                  </span>
+                </Link>
+                <span className="text-muted-foreground shrink-0">•</span>
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {formatDate(p.created_at)}
+                </span>
+              </div>
+              <PostMenu post={p} isOwner={user?.id === p.author_id} />
+            </div>
+
+            {/* Title */}
+            <h1 className="text-lg sm:text-xl font-bold mb-3">{p.title}</h1>
+
+            {/* Code */}
+            <div className="mb-4">
+              <CodePreview code={p.code} language={p.language} fileName={p.file_name} />
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Language Badge */}
+                <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  {p.language}
+                </span>
+
+                {/* Tags - Show first 2 on mobile */}
+                {p.tags && p.tags.length > 0 && (
+                  <div className="flex items-center gap-1">
+                    {p.tags.slice(0, 2).map((tag) => (
+                      <Tag key={tag} name={tag} />
+                    ))}
+                    {p.tags.length > 2 && (
+                      <span className="text-xs text-muted-foreground">
+                        +{p.tags.length - 2}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Comment Count */}
+              <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+                <MessageSquare className="w-3.5 h-3.5" />
+                <Suspense fallback={<span>Loading...</span>}>
+                  <CommentCount postId={id} />
+                </Suspense>
+              </span>
+            </div>
+
+            {/* Vote Buttons - Mobile */}
+            <div className="pt-3 border-t border-border/50">
+              <VoteButtons 
+                postId={p.id} 
+                score={score} 
+                orientation="horizontal" 
+                initialUserVote={userVote}
+              />
+            </div>
+          </div>
         </Card>
 
         {/* Comments Section - Streamed separately */}
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Comments</h2>
+          <h2 className="text-lg font-semibold px-1">Comments</h2>
 
           {/* Comment Form */}
           {user && <CommentSection postId={p.id} />}

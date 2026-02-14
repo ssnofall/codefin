@@ -52,16 +52,16 @@ export default function CreatePostPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Create Post</h1>
-        <p className="text-muted-foreground">Share your code with the community</p>
+        <h1 className="text-xl sm:text-2xl font-bold">Create Post</h1>
+        <p className="text-sm text-muted-foreground">Share your code with the community</p>
       </div>
 
-      <Card>
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <Card className="p-3 sm:p-5">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Title */}
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <label htmlFor="title" className="text-sm font-medium">
               Title <span className="text-destructive">*</span>
             </label>
@@ -71,50 +71,53 @@ export default function CreatePostPage() {
               name="title"
               required
               placeholder="Give your post a title"
-              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-colors"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-colors min-h-[44px]"
             />
           </div>
 
-          {/* Language */}
-          <div className="space-y-2">
-            <label htmlFor="language" className="text-sm font-medium">
-              Language <span className="text-destructive">*</span>
-            </label>
-            <select
-              id="language"
-              name="language"
-              required
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 appearance-none cursor-pointer text-foreground transition-colors"
-            >
-              <option value="" className="bg-card text-foreground">Select a language</option>
-              {LANGUAGES.map((lang) => (
-                <option key={lang} value={lang} className="bg-card text-foreground">
-                  {lang}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Language & File Name - Side by side on desktop, stacked on mobile */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-4">
+            {/* Language */}
+            <div className="space-y-1.5 sm:space-y-2">
+              <label htmlFor="language" className="text-sm font-medium">
+                Language <span className="text-destructive">*</span>
+              </label>
+              <select
+                id="language"
+                name="language"
+                required
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 appearance-none cursor-pointer text-foreground transition-colors min-h-[44px]"
+              >
+                <option value="" className="bg-card text-foreground">Select a language</option>
+                {LANGUAGES.map((lang) => (
+                  <option key={lang} value={lang} className="bg-card text-foreground">
+                    {lang}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* File Name */}
-          <div className="space-y-2">
-            <label htmlFor="file_name" className="text-sm font-medium">
-              File Name <span className="text-muted-foreground">(optional)</span>
-            </label>
-            <input
-              type="text"
-              id="file_name"
-              name="file_name"
-              value={fileName}
-              onChange={(e) => setFileName(e.target.value)}
-              placeholder="e.g., main.js, App.tsx, README.md"
-              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-colors"
-            />
+            {/* File Name */}
+            <div className="space-y-1.5 sm:space-y-2">
+              <label htmlFor="file_name" className="text-sm font-medium">
+                File Name <span className="text-muted-foreground text-xs">(optional)</span>
+              </label>
+              <input
+                type="text"
+                id="file_name"
+                name="file_name"
+                value={fileName}
+                onChange={(e) => setFileName(e.target.value)}
+                placeholder="e.g., main.js"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-colors min-h-[44px]"
+              />
+            </div>
           </div>
 
           {/* Code */}
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <label htmlFor="code" className="text-sm font-medium">
               Code <span className="text-destructive">*</span>
             </label>
@@ -130,21 +133,21 @@ export default function CreatePostPage() {
           </div>
 
           {/* Tags */}
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <label htmlFor="tags" className="text-sm font-medium">
-              Tags <span className="text-muted-foreground">(max {MAX_TAGS})</span>
+              Tags <span className="text-muted-foreground text-xs">(max {MAX_TAGS})</span>
             </label>
-            <div className="flex flex-wrap gap-2 mb-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                 >
                   #{tag}
                   <button
                     type="button"
                     onClick={() => removeTag(tag)}
-                    className="hover:text-emerald-300 transition-colors"
+                    className="hover:text-emerald-300 transition-colors touch-target min-w-[20px] min-h-[20px] flex items-center justify-center"
                   >
                     ×
                   </button>
@@ -157,28 +160,28 @@ export default function CreatePostPage() {
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={handleAddTag}
-              placeholder="Type a tag and press Enter (e.g., react, api, tutorial)"
+              placeholder="Type a tag and press Enter"
               disabled={tags.length >= MAX_TAGS}
-              className="w-full px-4 py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 transition-colors"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-card border border-input focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 disabled:opacity-50 transition-colors min-h-[44px]"
             />
             <p className="text-xs text-muted-foreground">
               Press Enter or comma to add a tag
             </p>
           </div>
 
-          {/* Submit */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-border">
+          {/* Submit - Responsive layout */}
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t border-border">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              className="w-full sm:w-auto px-4 py-3 sm:py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors min-h-[44px]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 py-3 sm:py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
             >
               {isSubmitting ? 'Creating...' : 'Create Post'}
             </button>

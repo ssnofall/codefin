@@ -60,17 +60,18 @@ export function VoteButtons({
       <button
         onClick={() => handleVote('up')}
         disabled={isPending}
-        className={`p-1.5 rounded-lg transition-colors ${
+        className={`p-2 rounded-lg transition-colors touch-target ${
           userVote === 'up'
             ? 'text-orange-500 bg-orange-500/10'
             : 'text-muted-foreground hover:text-orange-500 hover:bg-orange-500/10'
         }`}
+        aria-label="Upvote"
       >
-        <ChevronUp className="w-5 h-5" />
+        <ChevronUp className={`${isVertical ? 'w-5 h-5' : 'w-6 h-6'}`} />
       </button>
       
       <span
-        className={`font-bold text-sm ${
+        className={`font-bold ${isVertical ? 'text-sm' : 'text-base min-w-[2ch] text-center'} ${
           userVote === 'up'
             ? 'text-orange-500'
             : userVote === 'down'
@@ -84,13 +85,14 @@ export function VoteButtons({
       <button
         onClick={() => handleVote('down')}
         disabled={isPending}
-        className={`p-1.5 rounded-lg transition-colors ${
+        className={`p-2 rounded-lg transition-colors touch-target ${
           userVote === 'down'
             ? 'text-red-500 bg-red-500/10'
             : 'text-muted-foreground hover:text-red-500 hover:bg-red-500/10'
         }`}
+        aria-label="Downvote"
       >
-        <ChevronDown className="w-5 h-5" />
+        <ChevronDown className={`${isVertical ? 'w-5 h-5' : 'w-6 h-6'}`} />
       </button>
     </div>
   );
