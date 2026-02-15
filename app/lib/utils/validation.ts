@@ -5,6 +5,7 @@ import {
   VALID_LANGUAGE_REGEX,
   MAX_COMMENT_LENGTH,
   ALLOWED_REDIRECT_PATHS,
+  LANGUAGES,
 } from './constants'
 
 /**
@@ -29,13 +30,17 @@ export function validateTag(tag: string): boolean {
  * Validates and sanitizes language identifier
  */
 export function validateLanguage(language: string): string {
-  const sanitized = language.toLowerCase().trim()
+  const trimmed = language.trim()
   
-  if (!sanitized || !VALID_LANGUAGE_REGEX.test(sanitized)) {
+  const matchedLanguage = LANGUAGES.find(
+    (lang) => lang.toLowerCase() === trimmed.toLowerCase()
+  )
+  
+  if (!matchedLanguage || !VALID_LANGUAGE_REGEX.test(trimmed)) {
     throw new Error('Invalid language format')
   }
   
-  return sanitized
+  return matchedLanguage
 }
 
 /**
