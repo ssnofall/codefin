@@ -73,9 +73,11 @@ stackd/
 ├── components/ui/             # shadcn UI components
 ├── public/                    # Static assets
 ├── supabase/
-│   ├── schema.sql             # Database schema (tables, indexes, triggers)
-│   ├── rls.sql                # Row Level Security policies
-│   └── optimization.sql       # Performance optimizations (materialized views)
+│   ├── 00_schema.sql          # Database schema (tables, indexes)
+│   ├── 01_rls.sql             # Row Level Security policies
+│   ├── 02_functions.sql        # Database functions
+│   ├── 03_triggers.sql        # Triggers and materialized views
+│   └── 04_migrations.sql      # Security & performance patches
 ├── middleware.ts              # Auth middleware
 ├── next.config.ts             # Next.js configuration
 └── package.json
@@ -120,26 +122,39 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 ### 5. Set Up Database
 
-**Step 1: Run Schema (Creates tables and basic triggers)**
+Run the SQL files in order in the Supabase SQL Editor:
 
-1. Go to Supabase Dashboard > SQL Editor
-2. Open `supabase/schema.sql` from this repo
-3. Copy the contents and paste into SQL Editor
-4. Click "Run"
+**Step 1: Create Schema (Tables & Indexes)**
 
-**Step 2: Run RLS Policies (Security)**
-
-1. Open `supabase/rls.sql`
+1. Open `supabase/00_schema.sql`
 2. Copy the contents and paste into SQL Editor
 3. Click "Run"
 
-**Step 3: Run Optimizations (Performance)**
+**Step 2: Apply RLS Policies (Security)**
 
-1. Open `supabase/optimization.sql`
+1. Open `supabase/01_rls.sql`
 2. Copy the contents and paste into SQL Editor
 3. Click "Run"
 
-**Step 4: Verify Setup**
+**Step 3: Create Functions**
+
+1. Open `supabase/02_functions.sql`
+2. Copy the contents and paste into SQL Editor
+3. Click "Run"
+
+**Step 4: Create Triggers & Materialized Views**
+
+1. Open `supabase/03_triggers.sql`
+2. Copy the contents and paste into SQL Editor
+3. Click "Run"
+
+**Step 5: Apply Security & Performance Patches**
+
+1. Open `supabase/04_migrations.sql`
+2. Copy the contents and paste into SQL Editor
+3. Click "Run"
+
+**Step 6: Verify Setup**
 
 Run this query in SQL Editor to verify:
 ```sql
@@ -150,7 +165,7 @@ SELECT tablename FROM pg_tables WHERE schemaname = 'public';
 SELECT * FROM trending_tags LIMIT 5;
 
 -- If trending_tags is empty, refresh it:
-REFRESH MATERIALIZED VIEW trending_tags;
+REFRESH MATERIALIZED VIEW CONCURRENTLY trending_tags;
 ```
 
 ### 6. Set Up GitHub OAuth
@@ -168,7 +183,20 @@ REFRESH MATERIALIZED VIEW trending_tags;
 8. Paste in your Client ID and Client Secret
 9. Save
 
-### 7. Run Development Server
+### 7. Enable Password Security (Recommended)
+
+Enable leaked password protection to prevent users from using compromised passwords:
+
+1. Go to Supabase Dashboard > Authentication > Providers > Email
+2. Enable **"Enable leaked credentials protection"**
+3. Save
+
+Alternatively, use the Supabase CLI:
+```bash
+supabase auth password-leaked-protection enable
+```
+
+### 8. Run Development Server
 
 ```bash
 npm run dev
@@ -176,7 +204,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-### 8. Verify Everything Works
+### 9. Verify Everything Works
 
 1. Click "Sign In" and authenticate with GitHub
 2. Create a test post with tags
@@ -297,10 +325,10 @@ npm run build
    ```sql
    SELECT * FROM pg_matviews WHERE matviewname = 'trending_tags';
    ```
-2. If not found, run `supabase/optimization.sql`
+2. If not found, run `supabase/03_triggers.sql`
 3. Refresh the view:
    ```sql
-   REFRESH MATERIALIZED VIEW trending_tags;
+   REFRESH MATERIALIZED VIEW CONCURRENTLY trending_tags;
    ```
 4. Verify trigger exists:
    ```sql
@@ -324,7 +352,7 @@ npm run build
 **Solution**:
 1. Verify environment variables are set correctly
 2. Check Supabase project is active (not paused)
-3. Ensure RLS policies are set up (run `rls.sql`)
+3. Ensure RLS policies are set up (run `supabase/01_rls.sql`)
 4. Check if you're using the correct anon key (not service role key for client)
 
 ### Account Deletion Fails
@@ -348,11 +376,14 @@ npm run build
 ## Security Considerations
 
 - ✅ RLS policies protect user data
+- ✅ RLS policies optimized with (select auth.uid()) for better performance
+- ✅ Functions use secure search_path to prevent privilege escalation
 - ✅ Service role key never exposed to client
 - ✅ Rate limiting prevents spam
 - ✅ XSS protection via DOMPurify
 - ✅ Input validation on all forms
 - ✅ TypeScript for type safety
+- ✅ Leaked password protection enabled (recommended)
 
 ## Performance Features
 
@@ -379,7 +410,12 @@ MIT License - feel free to use this for personal or commercial projects.
 
 If you encounter issues:
 1. Check the Troubleshooting section above
-2. Review the SQL files in `supabase/` directory
+2. Review the SQL files in `supabase/` directory:
+   - `00_schema.sql` - Tables and indexes
+   - `01_rls.sql` - RLS policies
+   - `02_functions.sql` - Database functions
+   - `03_triggers.sql` - Triggers and materialized views
+   - `04_migrations.sql` - Security patches
 3. Check browser console and server logs
 4. Open an issue on GitHub
 
