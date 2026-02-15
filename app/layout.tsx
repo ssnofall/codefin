@@ -105,7 +105,9 @@ export default function RootLayout({
 
                 {/* Right Sidebar - Desktop Only */}
                 <aside className="hidden lg:block lg:sticky lg:top-20 lg:h-[calc(100vh-6rem)]">
-                  <RightSidebar />
+                  <Suspense fallback={<RightSidebarSkeleton />}>
+                    <RightSidebar />
+                  </Suspense>
                 </aside>
               </div>
             </div>
@@ -149,6 +151,53 @@ function LeftSidebarSkeleton() {
           </div>
         ))}
       </nav>
+    </div>
+  );
+}
+
+function RightSidebarSkeleton() {
+  return (
+    <div className="space-y-6 py-4">
+      <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="h-4 w-24 bg-muted rounded animate-pulse mb-4" />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="h-3 w-12 bg-muted rounded animate-pulse" />
+            <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-3 w-12 bg-muted rounded animate-pulse" />
+            <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="h-4 w-28 bg-muted rounded animate-pulse mb-4" />
+        <div className="space-y-3">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-3 w-4 bg-muted rounded animate-pulse" />
+                <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+              </div>
+              <div className="h-3 w-12 bg-muted rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="h-4 w-24 bg-muted rounded animate-pulse mb-4" />
+        <div className="space-y-3">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="space-y-2">
+              <div className="h-3 w-full bg-muted rounded animate-pulse" />
+              <div className="h-3 w-2/3 bg-muted rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
