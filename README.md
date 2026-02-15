@@ -75,9 +75,8 @@ stackd/
 ├── supabase/
 │   ├── 00_schema.sql          # Database schema (tables, indexes)
 │   ├── 01_rls.sql             # Row Level Security policies
-│   ├── 02_functions.sql        # Database functions
-│   ├── 03_triggers.sql        # Triggers and materialized views
-│   └── 04_migrations.sql      # Security & performance patches
+│   ├── 02_functions.sql       # Database functions
+│   └── 03_triggers.sql        # Triggers and materialized views
 ├── middleware.ts              # Auth middleware
 ├── next.config.ts             # Next.js configuration
 └── package.json
@@ -148,13 +147,7 @@ Run the SQL files in order in the Supabase SQL Editor:
 2. Copy the contents and paste into SQL Editor
 3. Click "Run"
 
-**Step 5: Apply Security & Performance Patches**
-
-1. Open `supabase/04_migrations.sql`
-2. Copy the contents and paste into SQL Editor
-3. Click "Run"
-
-**Step 6: Verify Setup**
+**Step 5: Verify Setup**
 
 Run this query in SQL Editor to verify:
 ```sql
@@ -415,7 +408,6 @@ If you encounter issues:
    - `01_rls.sql` - RLS policies
    - `02_functions.sql` - Database functions
    - `03_triggers.sql` - Triggers and materialized views
-   - `04_migrations.sql` - Security patches
 3. Check browser console and server logs
 4. Open an issue on GitHub
 
