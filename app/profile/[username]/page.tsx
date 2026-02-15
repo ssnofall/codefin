@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getProfileByUsername } from '../../lib/actions/profiles';
-import { getPostsByUser } from '../../lib/actions/posts';
+import { getPostsByUser, getUserVotesForPosts } from '../../lib/actions/posts';
 import { createClient, createStaticClient } from '../../lib/supabase/server';
 import { ProfileHeader } from '../../components/profile/ProfileHeader';
 import { ProfilePosts } from '../../components/profile/ProfilePosts';
@@ -52,6 +52,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     // Fetch posts
     const posts = await getPostsByUser(username);
 
+    // Fetch user votes for the posts
+    const postIds = posts.map((p: Tables<'posts'>) => p.id);
+    const userVotes = postIds.length > 0 ? await getUserVotesForPosts(postIds) : {};
+
     return (
       <div className="space-y-6">
         {/* Profile Header */}
@@ -61,7 +65,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         />
 
         {/* Posts */}
-        <ProfilePosts posts={posts} currentUserId={user?.id || null} />
+        <ProfilePosts posts={posts} userVotes={userVotes} currentUserId={user?.id || null} />
       </div>
     );
   } catch (error) {

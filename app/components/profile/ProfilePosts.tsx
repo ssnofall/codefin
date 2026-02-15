@@ -14,12 +14,13 @@ interface PostWithProfile extends Tables<'posts'> {
 
 interface ProfilePostsProps {
   posts: PostWithProfile[];
+  userVotes?: Record<string, 'up' | 'down'>;
   currentUserId?: string | null;
 }
 
 type SortOption = 'newest' | 'top' | 'oldest';
 
-export function ProfilePosts({ posts, currentUserId }: ProfilePostsProps) {
+export function ProfilePosts({ posts, userVotes = {}, currentUserId }: ProfilePostsProps) {
   const [sortBy, setSortBy] = useState<SortOption>('newest');
 
   const sortedPosts = [...posts].sort((a, b) => {
@@ -74,7 +75,7 @@ export function ProfilePosts({ posts, currentUserId }: ProfilePostsProps) {
           </div>
         </Card>
       ) : (
-        <PostList posts={sortedPosts} currentUserId={currentUserId} />
+        <PostList posts={sortedPosts} userVotes={userVotes} currentUserId={currentUserId} />
       )}
     </div>
   );
