@@ -1,5 +1,4 @@
 import { validate as validateUUID } from 'uuid'
-import DOMPurify from 'isomorphic-dompurify'
 import {
   MAX_TAG_LENGTH,
   VALID_TAG_REGEX,
@@ -54,6 +53,13 @@ export function validateRedirectPath(path: string): string {
 }
 
 /**
+ * Strips all HTML tags from text
+ */
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, '')
+}
+
+/**
  * Sanitizes comment body (text-only, no HTML)
  */
 export function sanitizeComment(body: string): string {
@@ -64,10 +70,7 @@ export function sanitizeComment(body: string): string {
   }
   
   // Strip all HTML tags from comments
-  return DOMPurify.sanitize(trimmed, {
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
-  })
+  return stripHtml(trimmed)
 }
 
 /**

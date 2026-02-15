@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import DOMPurify from 'isomorphic-dompurify';
+import DOMPurify from 'dompurify';
 import Editor from 'react-simple-code-editor';
 import { CopyButton } from '../post/CopyButton';
 
