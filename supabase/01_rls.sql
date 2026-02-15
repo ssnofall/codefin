@@ -86,5 +86,10 @@ create table if not exists rate_limits (
   unique(identifier, action, window_start)
 );
 
+-- Enable RLS for consistency with other tables
+-- Note: RLS is not strictly required since this table is only accessed
+-- server-side via service role client, which bypasses RLS
+alter table rate_limits enable row level security;
+
 create index idx_rate_limits_identifier on rate_limits(identifier, action);
 create index idx_rate_limits_window on rate_limits(window_start);
