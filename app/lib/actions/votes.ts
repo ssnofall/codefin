@@ -73,7 +73,7 @@ export async function vote(postId: string, type: 'up' | 'down' | null): Promise<
 
     // Check rate limit - per post to prevent vote spamming
     const rateLimitKey = getRateLimitKey(user.id, 'vote', postId)
-    const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.vote)
+    const rateLimitResult = await checkRateLimit(rateLimitKey, RATE_LIMITS.vote)
 
     if (rateLimitResult.limited) {
       throw new Error(`Please wait a moment before voting again.`)

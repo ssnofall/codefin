@@ -199,7 +199,7 @@ export async function createPost(formData: FormData): Promise<void> {
     
     // Check rate limit
     const rateLimitKey = getRateLimitKey(user.id, 'createPost')
-    const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.createPost)
+    const rateLimitResult = await checkRateLimit(rateLimitKey, RATE_LIMITS.createPost)
     
     if (rateLimitResult.limited) {
       throw new Error(`Rate limit exceeded. Please try again later.`)
@@ -413,7 +413,7 @@ export async function updatePost(postId: string, formData: FormData): Promise<Ta
     
     // Check rate limit
     const rateLimitKey = getRateLimitKey(user.id, 'updatePost', postId)
-    const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 5 })
+    const rateLimitResult = await checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 5 })
     
     if (rateLimitResult.limited) {
       throw new Error(`Rate limit exceeded. Please try again later.`)
@@ -529,7 +529,7 @@ export async function deletePost(postId: string): Promise<void> {
     
     // Check rate limit
     const rateLimitKey = getRateLimitKey(user.id, 'deletePost')
-    const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
+    const rateLimitResult = await checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
     
     if (rateLimitResult.limited) {
       throw new Error(`Rate limit exceeded. Please try again later.`)
