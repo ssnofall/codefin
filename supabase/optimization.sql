@@ -25,6 +25,9 @@ ORDER BY count DESC;
 CREATE INDEX IF NOT EXISTS idx_trending_tags_count ON trending_tags(count DESC);
 CREATE INDEX IF NOT EXISTS idx_trending_tags_tag ON trending_tags(tag);
 
+-- Required for REFRESH MATERIALIZED VIEW CONCURRENTLY to work
+CREATE UNIQUE INDEX IF NOT EXISTS idx_trending_tags_unique_tag ON trending_tags(tag);
+
 -- ============================================
 -- STEP 3: Create Manual Refresh Function
 -- ============================================
@@ -68,7 +71,7 @@ EXECUTE FUNCTION refresh_trending_tags_trigger();
 -- ============================================
 -- Populate the view with existing data immediately
 
-REFRESH MATERIALIZED VIEW trending_tags;
+REFRESH MATERIALIZED VIEW CONCURRENTLY trending_tags;
 
 -- ============================================
 -- STEP 6: Verification
