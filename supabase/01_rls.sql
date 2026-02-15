@@ -74,3 +74,17 @@ drop policy if exists "Users can delete own comments" on comments;
 create policy "Users can delete own comments"
   on comments for delete
   using ((select auth.uid()) = user_id);
+
+-- Rate Limits Table (for multi-instance rate limiting)
+create table if not exists rate_limits (
+  id uuid default gen_random_uuid() primary key,
+  identifier text not null,
+  action text not null,
+  count int default 1 not null,
+  window_start timestamp with time zone default now() not null,
+  created_at timestamp with time zone default now() not null,
+  unique(identifier, action, window_start)
+);
+
+create index idx_rate_limits_identifier on rate_limits(identifier, action);
+create index idx_rate_limits_window on rate_limits(window_start);

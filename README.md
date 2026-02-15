@@ -378,6 +378,37 @@ npm run build
 - ✅ TypeScript for type safety
 - ✅ Leaked password protection enabled (recommended)
 
+## CSP (Content Security Policy) Tradeoffs
+
+### Recommendation
+
+For your current free-tier beta, just document that this is necessary for Shiki and Tailwind. It's not critical.
+
+In the future, if you harden CSP:
+
+- Use nonce-based inline scripts for Tailwind instead of unsafe-inline
+- Explore Shiki WebAssembly build to remove unsafe-eval
+
+### What unsafe-eval and unsafe-inline mean
+
+**unsafe-eval**: Allows JavaScript code to be executed from `eval()` or similar functions. Shiki uses this for syntax highlighting.
+
+**unsafe-inline**: Allows inline `<script>` or inline styles to run. Tailwind uses this for dynamic CSS injection in dev builds or certain compiled styles.
+
+Both are considered relaxations of the browser's Content Security Policy, because if an attacker can inject their own JS into your page, they could run it.
+
+### Why it's less critical for your app
+
+You already sanitize user input with DOMPurify and stripHtml(), so users cannot inject raw `<script>` tags or arbitrary JS into posts/comments.
+
+Only your own scripts are running unsafe-eval / unsafe-inline, not untrusted user content.
+
+No sensitive data (API keys, service role keys) is exposed to the frontend.
+
+Your OAuth / Supabase auth is server-side, so even if an attacker could run JS on the page, they can't bypass auth or steal secrets.
+
+✅ In short: it's a risk if user input could reach that eval/inline JS, but you've already mitigated that.
+
 ## Performance Features
 
 - Materialized views for fast aggregations

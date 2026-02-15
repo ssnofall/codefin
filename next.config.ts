@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react'],
   },
   // Add security headers
+  // CSP Note: 'unsafe-eval' is required for Shiki syntax highlighting library
+  // 'unsafe-inline' is required for Tailwind CSS dynamic classes
+  // These are known tradeoffs. Future hardening:
+  // - Use nonce-based inline scripts for Tailwind instead of unsafe-inline
+  // - Explore Shiki WebAssembly build to remove unsafe-eval
   async headers() {
     return [
       {
