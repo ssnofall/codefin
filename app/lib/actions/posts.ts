@@ -1,7 +1,7 @@
 'use server'
 
 import { cache } from 'react'
-import { createClient } from '../supabase/server'
+import { createClient, createStaticClient } from '../supabase/server'
 import { revalidatePath } from 'next/cache'
 import { Tables, TablesInsert } from '../supabase/types'
 import { validateId, validateTag, validateLanguage } from '../utils/validation'
@@ -169,47 +169,85 @@ export const getPostsByUser = cache(async (username: string) => {
 })
 
 export async function createPost(formData: FormData): Promise<void> {
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
-  
-  // Check rate limit
-  const rateLimitKey = getRateLimitKey(user.id, 'createPost')
-  const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.createPost)
-  
-  if (rateLimitResult.limited) {
-    throw new Error(`Rate limit exceeded. Please try again later.`)
-  }
-  
-  const title = formData.get('title') as string
-  const code = formData.get('code') as string
-  const language = formData.get('language') as string
-  const fileName = formData.get('file_name') as string
-  const tagsString = formData.get('tags') as string
-  
-  // Validate all inputs
-  const validated = validatePostInputs(title, code, language, fileName, tagsString)
-  
-  const insertData: TablesInsert<'posts'> = {
-    author_id: user.id,
-    title: validated.title,
-    code: validated.code,
-    language: validated.language,
-    file_name: validated.fileName,
-    tags: validated.tags,
-  }
+  try {
+    let supabase
+    try {
+      supabase = await createClient()
+    } catch (clientError) {
+      console.error('Failed to create Supabase client in createPost:', clientError)
+      throw new Error('Authentication service unavailable')
+    }
 
-  const { error } = await supabase
-    .from('posts')
-    // Type assertion required due to Supabase client inference limitation
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .insert(insertData as any)
-  
-  if (error) throw error
-  
-  revalidatePath('/feed')
-  revalidatePath('/new')
+    let user
+    try {
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError) {
+        console.error('Auth error in createPost:', authError.message, authError)
+        throw new Error(`Authentication failed: ${authError.message}`)
+      }
+      
+      user = authUser
+    } catch (authError) {
+      console.error('Exception getting user in createPost:', authError)
+      throw new Error('Failed to verify authentication')
+    }
+    
+    if (!user) {
+      throw new Error('Not authenticated')
+    }
+    
+    // Check rate limit
+    const rateLimitKey = getRateLimitKey(user.id, 'createPost')
+    const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.createPost)
+    
+    if (rateLimitResult.limited) {
+      throw new Error(`Rate limit exceeded. Please try again later.`)
+    }
+    
+    const title = formData.get('title') as string
+    const code = formData.get('code') as string
+    const language = formData.get('language') as string
+    const fileName = formData.get('file_name') as string
+    const tagsString = formData.get('tags') as string
+    
+    // Validate all inputs
+    const validated = validatePostInputs(title, code, language, fileName, tagsString)
+    
+    const insertData: TablesInsert<'posts'> = {
+      author_id: user.id,
+      title: validated.title,
+      code: validated.code,
+      language: validated.language,
+      file_name: validated.fileName,
+      tags: validated.tags,
+    }
+
+    try {
+      const { error } = await supabase
+        .from('posts')
+        // Type assertion required due to Supabase client inference limitation
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .insert(insertData as any)
+      
+      if (error) {
+        console.error('Database error in createPost:', error)
+        throw new Error(`Failed to create post: ${error.message}`)
+      }
+    } catch (dbError) {
+      console.error('Database operation failed in createPost:', dbError)
+      throw new Error('Failed to create post. Please try again.')
+    }
+    
+    revalidatePath('/feed')
+    revalidatePath('/new')
+  } catch (error) {
+    console.error('createPost action failed:', error)
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error('Failed to create post. Please try again.')
+  }
 }
 
 // Optimized trending tags using materialized view with auto-refresh trigger
@@ -218,7 +256,8 @@ export async function createPost(formData: FormData): Promise<void> {
 // Auto-refresh trigger ensures data stays current when posts are created/updated/deleted
 // Falls back to JavaScript aggregation if view doesn't exist
 export const getTrendingTags = cache(async () => {
-  const supabase = await createClient()
+  // Use static client since this doesn't require authentication
+  const supabase = createStaticClient()
   
   // Try to use materialized view first (much faster - O(1) vs O(n) scanning)
   try {
@@ -267,7 +306,8 @@ export const getTrendingTags = cache(async () => {
 })
 
 export const getPlatformStats = cache(async () => {
-  const supabase = await createClient()
+  // Use static client since this doesn't require authentication
+  const supabase = createStaticClient()
   
   const [{ count: postCount }, { count: userCount }] = await Promise.all([
     supabase.from('posts').select('*', { count: 'exact', head: true }),
@@ -308,7 +348,8 @@ export const getUserVotesForPosts = cache(async (postIds: string[]) => {
 
 // Get language distribution across all posts
 export const getLanguageDistribution = cache(async () => {
-  const supabase = await createClient()
+  // Use static client since this doesn't require authentication
+  const supabase = createStaticClient()
   
   const { data, error } = await supabase
     .from('posts')
@@ -340,148 +381,225 @@ export const getLanguageDistribution = cache(async () => {
 })
 
 export async function updatePost(postId: string, formData: FormData): Promise<Tables<'posts'>> {
-  validateId(postId, 'post ID')
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    throw new Error('Not authenticated')
-  }
-  
-  // Check rate limit
-  const rateLimitKey = getRateLimitKey(user.id, 'updatePost', postId)
-  const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 5 })
-  
-  if (rateLimitResult.limited) {
-    throw new Error(`Rate limit exceeded. Please try again later.`)
-  }
-  
-  // Check ownership
-  const { data: post, error: fetchError } = await supabase
-    .from('posts')
-    .select('author_id')
-    .eq('id', postId)
-    .single()
-  
-  if (fetchError || !post) {
-    throw new Error('Post not found')
-  }
-  
-  // Type-safe author check
-  interface PostWithAuthor {
-    author_id: string
-  }
-  const postData = post as PostWithAuthor
-  if (postData.author_id !== user.id) {
-    throw new Error('Not authorized')
-  }
-  
-  const title = formData.get('title') as string
-  const code = formData.get('code') as string
-  const language = formData.get('language') as string
-  const fileName = formData.get('file_name') as string
-  const tagsString = formData.get('tags') as string
-  
-  // Validate all inputs
-  const validated = validatePostInputs(title, code, language, fileName, tagsString)
-  
-  const updateData = {
-    title: validated.title,
-    code: validated.code,
-    language: validated.language,
-    file_name: validated.fileName,
-    tags: validated.tags,
-  }
-  
-  // Define update payload with proper typing workaround for Supabase
-  const updatePayload = {
-    title: validated.title,
-    code: validated.code,
-    language: validated.language,
-    file_name: validated.fileName,
-    tags: validated.tags,
-  }
+  try {
+    validateId(postId, 'post ID')
+    
+    let supabase
+    try {
+      supabase = await createClient()
+    } catch (clientError) {
+      console.error('Failed to create Supabase client in updatePost:', clientError)
+      throw new Error('Authentication service unavailable')
+    }
 
-  const { data, error } = await (supabase
-    .from('posts') as any)
-    .update(updatePayload)
-    .eq('id', postId)
-    .eq('author_id', user.id)
-    .select()
-    .single()
+    let user
+    try {
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError) {
+        console.error('Auth error in updatePost:', authError.message, authError)
+        throw new Error(`Authentication failed: ${authError.message}`)
+      }
+      
+      user = authUser
+    } catch (authError) {
+      console.error('Exception getting user in updatePost:', authError)
+      throw new Error('Failed to verify authentication')
+    }
+    
+    if (!user) {
+      throw new Error('Not authenticated')
+    }
+    
+    // Check rate limit
+    const rateLimitKey = getRateLimitKey(user.id, 'updatePost', postId)
+    const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 5 })
+    
+    if (rateLimitResult.limited) {
+      throw new Error(`Rate limit exceeded. Please try again later.`)
+    }
+    
+    // Check ownership
+    const { data: post, error: fetchError } = await supabase
+      .from('posts')
+      .select('author_id')
+      .eq('id', postId)
+      .single()
+    
+    if (fetchError || !post) {
+      throw new Error('Post not found')
+    }
+    
+    // Type-safe author check
+    interface PostWithAuthor {
+      author_id: string
+    }
+    const postData = post as PostWithAuthor
+    if (postData.author_id !== user.id) {
+      throw new Error('Not authorized')
+    }
+    
+    const title = formData.get('title') as string
+    const code = formData.get('code') as string
+    const language = formData.get('language') as string
+    const fileName = formData.get('file_name') as string
+    const tagsString = formData.get('tags') as string
+    
+    // Validate all inputs
+    const validated = validatePostInputs(title, code, language, fileName, tagsString)
+    
+    // Define update payload with proper typing workaround for Supabase
+    const updatePayload = {
+      title: validated.title,
+      code: validated.code,
+      language: validated.language,
+      file_name: validated.fileName,
+      tags: validated.tags,
+    }
 
-  if (error) {
-    throw new Error(`Failed to update post: ${error.message}`)
+    try {
+      const { data, error } = await (supabase
+        .from('posts') as any)
+        .update(updatePayload)
+        .eq('id', postId)
+        .eq('author_id', user.id)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Database error in updatePost:', error)
+        throw new Error(`Failed to update post: ${error.message}`)
+      }
+
+      if (!data) {
+        throw new Error('Post update succeeded but no data returned')
+      }
+
+      revalidatePath('/feed')
+      revalidatePath('/new')
+      revalidatePath('/trending')
+      revalidatePath('/top')
+      revalidatePath(`/post/${postId}`)
+
+      // Return typed post data
+      return data as Tables<'posts'>
+    } catch (dbError) {
+      console.error('Database operation failed in updatePost:', dbError)
+      throw new Error('Failed to update post. Please try again.')
+    }
+  } catch (error) {
+    console.error('updatePost action failed:', error)
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error('Failed to update post. Please try again.')
   }
-
-  if (!data) {
-    throw new Error('Post update succeeded but no data returned')
-  }
-
-  revalidatePath('/feed')
-  revalidatePath('/new')
-  revalidatePath('/trending')
-  revalidatePath('/top')
-  revalidatePath(`/post/${postId}`)
-
-  // Return typed post data
-  return data as Tables<'posts'>
 }
 
 export async function deletePost(postId: string): Promise<void> {
-  validateId(postId, 'post ID')
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
-  
-  // Check rate limit
-  const rateLimitKey = getRateLimitKey(user.id, 'deletePost')
-  const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
-  
-  if (rateLimitResult.limited) {
-    throw new Error(`Rate limit exceeded. Please try again later.`)
+  try {
+    validateId(postId, 'post ID')
+    
+    let supabase
+    try {
+      supabase = await createClient()
+    } catch (clientError) {
+      console.error('Failed to create Supabase client in deletePost:', clientError)
+      throw new Error('Authentication service unavailable')
+    }
+
+    let user
+    try {
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError) {
+        console.error('Auth error in deletePost:', authError.message, authError)
+        throw new Error(`Authentication failed: ${authError.message}`)
+      }
+      
+      user = authUser
+    } catch (authError) {
+      console.error('Exception getting user in deletePost:', authError)
+      throw new Error('Failed to verify authentication')
+    }
+    
+    if (!user) {
+      throw new Error('Not authenticated')
+    }
+    
+    // Check rate limit
+    const rateLimitKey = getRateLimitKey(user.id, 'deletePost')
+    const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
+    
+    if (rateLimitResult.limited) {
+      throw new Error(`Rate limit exceeded. Please try again later.`)
+    }
+    
+    // Check ownership
+    const { data: post, error: fetchError } = await supabase
+      .from('posts')
+      .select('author_id')
+      .eq('id', postId)
+      .single()
+    
+    if (fetchError || !post) {
+      throw new Error('Post not found')
+    }
+    
+    // Type-safe author check
+    if ((post as { author_id: string }).author_id !== user.id) {
+      throw new Error('Not authorized')
+    }
+    
+    try {
+      // Delete comments first (foreign key constraint)
+      const { error: commentsError } = await supabase
+        .from('comments')
+        .delete()
+        .eq('post_id', postId)
+      
+      if (commentsError) {
+        console.error('Error deleting comments:', commentsError)
+        throw new Error(`Failed to delete comments: ${commentsError.message}`)
+      }
+      
+      // Delete votes
+      const { error: votesError } = await supabase
+        .from('votes')
+        .delete()
+        .eq('post_id', postId)
+      
+      if (votesError) {
+        console.error('Error deleting votes:', votesError)
+        throw new Error(`Failed to delete votes: ${votesError.message}`)
+      }
+      
+      // Delete post
+      const { error: postError } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId)
+        .eq('author_id', user.id)
+      
+      if (postError) {
+        console.error('Error deleting post:', postError)
+        throw new Error(`Failed to delete post: ${postError.message}`)
+      }
+    } catch (dbError) {
+      console.error('Database operation failed in deletePost:', dbError)
+      throw new Error('Failed to delete post. Please try again.')
+    }
+    
+    revalidatePath('/feed')
+    revalidatePath('/new')
+    revalidatePath('/trending')
+    revalidatePath('/top')
+    revalidatePath('/profile/[username]')
+  } catch (error) {
+    console.error('deletePost action failed:', error)
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error('Failed to delete post. Please try again.')
   }
-  
-  // Check ownership
-  const { data: post, error: fetchError } = await supabase
-    .from('posts')
-    .select('author_id')
-    .eq('id', postId)
-    .single()
-  
-  if (fetchError || !post) throw new Error('Post not found')
-  // Type-safe author check
-  if ((post as { author_id: string }).author_id !== user.id) throw new Error('Not authorized')
-  
-  // Delete comments first (foreign key constraint)
-  const { error: commentsError } = await supabase
-    .from('comments')
-    .delete()
-    .eq('post_id', postId)
-  
-  if (commentsError) throw commentsError
-  
-  // Delete votes
-  const { error: votesError } = await supabase
-    .from('votes')
-    .delete()
-    .eq('post_id', postId)
-  
-  if (votesError) throw votesError
-  
-  // Delete post
-  const { error: postError } = await supabase
-    .from('posts')
-    .delete()
-    .eq('id', postId)
-    .eq('author_id', user.id)
-  
-  if (postError) throw postError
-  
-  revalidatePath('/feed')
-  revalidatePath('/new')
-  revalidatePath('/trending')
-  revalidatePath('/top')
-  revalidatePath('/profile/[username]')
 }
