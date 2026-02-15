@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import { CopyButton } from './CopyButton';
 
 interface CodePreviewProps {
@@ -31,7 +32,12 @@ export function CodePreview({ code, language, fileName }: CodePreviewProps) {
         });
 
         if (isMounted) {
-          setHighlighted(html);
+          // Sanitize Shiki HTML output to prevent XSS
+          const sanitizedHtml = DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ['pre', 'code', 'span', 'div'],
+            ALLOWED_ATTR: ['class', 'style', 'data-lang'],
+          });
+          setHighlighted(sanitizedHtml);
           setIsLoading(false);
         }
       } catch (err) {

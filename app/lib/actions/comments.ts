@@ -5,6 +5,7 @@ import { createClient } from '../supabase/server'
 import { revalidatePath } from 'next/cache'
 import { Tables, TablesInsert } from '../supabase/types'
 import { validateId, sanitizeComment } from '../utils/validation'
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '../utils/rateLimit'
 import { COMMENTS_PER_PAGE } from '../utils/constants'
 
 interface CommentWithProfile extends Tables<'comments'> {
@@ -51,6 +52,14 @@ export async function createComment(postId: string, body: string): Promise<void>
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
   
+  // Check rate limit
+  const rateLimitKey = getRateLimitKey(user.id, 'createComment')
+  const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.createComment)
+  
+  if (rateLimitResult.limited) {
+    throw new Error(`Rate limit exceeded. Please try again later.`)
+  }
+  
   if (!body || !body.trim()) {
     throw new Error('Comment cannot be empty')
   }
@@ -67,12 +76,10 @@ export async function createComment(postId: string, body: string): Promise<void>
     user_id: user.id,
     body: sanitizedBody,
   }
-  
-  // Type assertion needed due to Supabase TypeScript inference issue
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await supabase
-    .from('comments')
-    .insert(commentData as any)
+
+  const { error } = await (supabase
+    .from('comments') as any)
+    .insert(commentData)
   
   if (error) throw error
   
@@ -87,6 +94,14 @@ export async function deleteComment(commentId: string, postId: string): Promise<
   
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
+  
+  // Check rate limit
+  const rateLimitKey = getRateLimitKey(user.id, 'deleteComment')
+  const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
+  
+  if (rateLimitResult.limited) {
+    throw new Error(`Rate limit exceeded. Please try again later.`)
+  }
   
   const { error } = await supabase
     .from('comments')

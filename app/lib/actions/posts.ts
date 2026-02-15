@@ -5,6 +5,7 @@ import { createClient } from '../supabase/server'
 import { revalidatePath } from 'next/cache'
 import { Tables, TablesInsert } from '../supabase/types'
 import { validateId, validateTag, validateLanguage } from '../utils/validation'
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '../utils/rateLimit'
 import {
   MAX_TITLE_LENGTH,
   MAX_CODE_LENGTH,
@@ -173,6 +174,14 @@ export async function createPost(formData: FormData): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
   
+  // Check rate limit
+  const rateLimitKey = getRateLimitKey(user.id, 'createPost')
+  const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.createPost)
+  
+  if (rateLimitResult.limited) {
+    throw new Error(`Rate limit exceeded. Please try again later.`)
+  }
+  
   const title = formData.get('title') as string
   const code = formData.get('code') as string
   const language = formData.get('language') as string
@@ -182,18 +191,20 @@ export async function createPost(formData: FormData): Promise<void> {
   // Validate all inputs
   const validated = validatePostInputs(title, code, language, fileName, tagsString)
   
-  // Type assertion needed due to Supabase TypeScript inference issue
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const insertData: TablesInsert<'posts'> = {
+    author_id: user.id,
+    title: validated.title,
+    code: validated.code,
+    language: validated.language,
+    file_name: validated.fileName,
+    tags: validated.tags,
+  }
+
   const { error } = await supabase
     .from('posts')
-    .insert({
-      author_id: user.id,
-      title: validated.title,
-      code: validated.code,
-      language: validated.language,
-      file_name: validated.fileName,
-      tags: validated.tags,
-    } as any)
+    // Type assertion required due to Supabase client inference limitation
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .insert(insertData as any)
   
   if (error) throw error
   
@@ -201,11 +212,15 @@ export async function createPost(formData: FormData): Promise<void> {
   revalidatePath('/new')
 }
 
-// Optimized trending tags using materialized view (falls back to query if view doesn't exist)
+// Optimized trending tags using materialized view with auto-refresh trigger
+// The materialized view 'trending_tags' is created in supabase/optimization.sql
+// It pre-aggregates tag counts from posts in the last 30 days for fast queries
+// Auto-refresh trigger ensures data stays current when posts are created/updated/deleted
+// Falls back to JavaScript aggregation if view doesn't exist
 export const getTrendingTags = cache(async () => {
   const supabase = await createClient()
   
-  // Try to use materialized view first (much faster)
+  // Try to use materialized view first (much faster - O(1) vs O(n) scanning)
   try {
     const { data: viewData, error: viewError } = await supabase
       .from('trending_tags')
@@ -232,12 +247,17 @@ export const getTrendingTags = cache(async () => {
   if (error) throw error
   
   const tagCounts: Record<string, number> = {}
-  // Type assertion needed due to Supabase TypeScript inference issue
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(data as any)?.forEach((post: any) => {
-    post.tags?.forEach((tag: string) => {
-      tagCounts[tag] = (tagCounts[tag] || 0) + 1
-    })
+  // Type-safe iteration over query results
+  interface PostWithTags {
+    tags: string[] | null
+  }
+  const posts = (data || []) as PostWithTags[]
+  posts.forEach((post) => {
+    if (post.tags && Array.isArray(post.tags)) {
+      post.tags.forEach((tag: string) => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1
+      })
+    }
   })
   
   return Object.entries(tagCounts)
@@ -275,9 +295,12 @@ export const getUserVotesForPosts = cache(async (postIds: string[]) => {
     .in('post_id', postIds)
     .eq('user_id', user.id)
   
-  // Type assertion needed due to Supabase TypeScript inference issue
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return ((data as any) || []).reduce((acc: Record<string, 'up' | 'down'>, vote: any) => {
+  // Type-safe vote aggregation
+  interface VoteResult {
+    post_id: string
+    type: 'up' | 'down'
+  }
+  return ((data || []) as VoteResult[]).reduce((acc, vote) => {
     acc[vote.post_id] = vote.type
     return acc
   }, {} as Record<string, 'up' | 'down'>)
@@ -294,13 +317,18 @@ export const getLanguageDistribution = cache(async () => {
   if (error) throw error
   
   const languageCounts: Record<string, number> = {}
-  // Type assertion needed due to Supabase TypeScript inference issue
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(data as any)?.forEach((post: any) => {
-    languageCounts[post.language] = (languageCounts[post.language] || 0) + 1
+  // Type-safe iteration
+  interface PostWithLanguage {
+    language: string
+  }
+  const posts = (data || []) as PostWithLanguage[]
+  posts.forEach((post) => {
+    if (post.language) {
+      languageCounts[post.language] = (languageCounts[post.language] || 0) + 1
+    }
   })
   
-  const total = (data as any)?.length || 1
+  const total = posts.length || 1
   
   return Object.entries(languageCounts)
     .map(([language, count]) => ({
@@ -320,6 +348,14 @@ export async function updatePost(postId: string, formData: FormData): Promise<Ta
     throw new Error('Not authenticated')
   }
   
+  // Check rate limit
+  const rateLimitKey = getRateLimitKey(user.id, 'updatePost', postId)
+  const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 5 })
+  
+  if (rateLimitResult.limited) {
+    throw new Error(`Rate limit exceeded. Please try again later.`)
+  }
+  
   // Check ownership
   const { data: post, error: fetchError } = await supabase
     .from('posts')
@@ -331,9 +367,11 @@ export async function updatePost(postId: string, formData: FormData): Promise<Ta
     throw new Error('Post not found')
   }
   
-  // Type assertion needed due to Supabase TypeScript inference issue
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const postData = post as any
+  // Type-safe author check
+  interface PostWithAuthor {
+    author_id: string
+  }
+  const postData = post as PostWithAuthor
   if (postData.author_id !== user.id) {
     throw new Error('Not authorized')
   }
@@ -355,33 +393,39 @@ export async function updatePost(postId: string, formData: FormData): Promise<Ta
     tags: validated.tags,
   }
   
-  // Type assertion needed due to Supabase TypeScript inference issue
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Define update payload with proper typing workaround for Supabase
+  const updatePayload = {
+    title: validated.title,
+    code: validated.code,
+    language: validated.language,
+    file_name: validated.fileName,
+    tags: validated.tags,
+  }
+
   const { data, error } = await (supabase
     .from('posts') as any)
-    .update(updateData)
+    .update(updatePayload)
     .eq('id', postId)
     .eq('author_id', user.id)
     .select()
     .single()
-  
+
   if (error) {
     throw new Error(`Failed to update post: ${error.message}`)
   }
-  
+
   if (!data) {
     throw new Error('Post update succeeded but no data returned')
   }
-  
+
   revalidatePath('/feed')
   revalidatePath('/new')
   revalidatePath('/trending')
   revalidatePath('/top')
   revalidatePath(`/post/${postId}`)
-  
-  // Type assertion needed due to Supabase TypeScript inference issue
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return data as any
+
+  // Return typed post data
+  return data as Tables<'posts'>
 }
 
 export async function deletePost(postId: string): Promise<void> {
@@ -391,6 +435,14 @@ export async function deletePost(postId: string): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
   
+  // Check rate limit
+  const rateLimitKey = getRateLimitKey(user.id, 'deletePost')
+  const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
+  
+  if (rateLimitResult.limited) {
+    throw new Error(`Rate limit exceeded. Please try again later.`)
+  }
+  
   // Check ownership
   const { data: post, error: fetchError } = await supabase
     .from('posts')
@@ -399,9 +451,8 @@ export async function deletePost(postId: string): Promise<void> {
     .single()
   
   if (fetchError || !post) throw new Error('Post not found')
-  // Type assertion needed due to Supabase TypeScript inference issue
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if ((post as any).author_id !== user.id) throw new Error('Not authorized')
+  // Type-safe author check
+  if ((post as { author_id: string }).author_id !== user.id) throw new Error('Not authorized')
   
   // Delete comments first (foreign key constraint)
   const { error: commentsError } = await supabase

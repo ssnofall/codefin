@@ -14,8 +14,11 @@ export default function ErrorBoundary({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error('Application error:', error);
+    // Only log errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Application error:', error);
+    }
+    // TODO: Send error to error reporting service (e.g., Sentry) in production
   }, [error]);
 
   return (

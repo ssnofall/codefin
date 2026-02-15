@@ -1,107 +1,388 @@
-# Stackd MVP
+# Stackd
 
 Share Code. Get Seen.
 
+A modern platform for developers to share code snippets, get feedback, and build their reputation.
+
 ## Tech Stack
 
-- **Frontend**: Next.js 14+ (App Router), TypeScript, TailwindCSS
+- **Frontend**: Next.js 16+ (App Router), TypeScript, TailwindCSS, Shadcn UI
 - **Backend**: Supabase (PostgreSQL + Auth + RLS)
 - **Auth**: GitHub OAuth via Supabase
 - **Hosting**: Vercel (Free Tier compatible)
+- **Syntax Highlighting**: Shiki
 
 ## Features
 
-- GitHub OAuth authentication
-- Create posts with title, code, language, and tags (max 5)
-- Feed with sorting (Hot, New, Top)
-- Voting system (upvote/downvote)
-- Comments (text-only, delete own)
-- Tag filtering
-- User profiles with stats
-- Syntax highlighting with Shiki
+- GitHub OAuth authentication with auto-profile creation
+- Create posts with title, code, language, file name, and tags (max 5)
+- Rich feed with sorting (Hot, New, Top, Trending)
+- Real-time voting system (upvote/downvote)
+- Comments with delete functionality
+- Tag filtering and trending topics
+- User profiles with reputation scores
+- Syntax highlighting for 20+ programming languages
+- Responsive design (mobile, tablet, desktop)
+- Dark/light theme support
+- Rate limiting to prevent spam
+
+## Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+- GitHub account (for OAuth)
+- Supabase account (free tier works)
+- Vercel account (for deployment)
 
 ## Project Structure
 
 ```
 stackd/
 ├── app/
-│   ├── (routes)/
-│   │   ├── feed/              # Main feed
-│   │   ├── new/               # Newest posts
-│   │   ├── top/               # Top posts
-│   │   ├── trending/          # Trending posts
-│   │   ├── saved/             # Saved posts
-│   │   ├── post/[id]/         # Post detail
-│   │   ├── profile/[username]/# Profile page
-│   │   └── create/            # Create post form
-│   ├── auth/
-│   │   ├── login/             # GitHub OAuth login
-│   │   ├── callback/          # OAuth callback
-│   │   └── logout/            # Sign out
-│   ├── components/
-│   │   ├── layout/            # Layout components
+│   ├── auth/                  # Authentication routes
+│   │   ├── callback/          # OAuth callback handler
+│   │   ├── login/             # Login page
+│   │   └── logout/            # Logout handler
+│   ├── components/            # React components
+│   │   ├── editor/            # Code editor components
 │   │   ├── feed/              # Feed components
+│   │   ├── layout/            # Layout components (Header, Sidebars, etc.)
 │   │   ├── post/              # Post components
 │   │   ├── profile/           # Profile components
-│   │   └── ui/                # Reusable UI
+│   │   ├── theme/             # Theme components
+│   │   └── ui/                # Reusable UI components (shadcn)
 │   ├── lib/
-│   │   ├── supabase/          # Supabase clients
-│   │   ├── actions/           # Server actions
-│   │   └── utils/             # Utilities
-│   └── globals.css
+│   │   ├── actions/           # Server actions (posts, comments, votes, auth)
+│   │   ├── supabase/          # Supabase clients and types
+│   │   └── utils/             # Utilities (validation, rate limiting, formatters)
+│   ├── feed/                  # Feed page
+│   ├── new/                   # New posts page
+│   ├── top/                   # Top posts page
+│   ├── trending/              # Trending posts page
+│   ├── post/[id]/             # Post detail page
+│   ├── profile/[username]/    # Profile page
+│   ├── create/                # Create post page
+│   ├── settings/              # User settings page
+│   ├── discover/              # Discover page
+│   ├── privacy/               # Privacy policy
+│   ├── terms/                 # Terms of service
+│   ├── error.tsx              # Error boundary
+│   ├── globals.css            # Global styles
+│   ├── layout.tsx             # Root layout
+│   └── loading.tsx            # Loading states
+├── components/ui/             # shadcn UI components
+├── public/                    # Static assets
 ├── supabase/
-│   ├── schema.sql             # Database schema
-│   └── rls.sql                # RLS policies
-└── ...
+│   ├── schema.sql             # Database schema (tables, indexes, triggers)
+│   ├── rls.sql                # Row Level Security policies
+│   └── optimization.sql       # Performance optimizations (materialized views)
+├── middleware.ts              # Auth middleware
+├── next.config.ts             # Next.js configuration
+└── package.json
 ```
 
-## Environment Variables
+## Local Development Setup
 
-Create `.env.local`:
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/stackd.git
+cd stackd
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Set Up Supabase Project
+
+1. Go to [supabase.com](https://supabase.com) and create a new project
+2. Note your project URL and anon key (Settings > API)
+3. Get your service role key (Settings > API > service_role key)
+
+### 4. Configure Environment Variables
+
+Create `.env.local` in the project root:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Site Configuration
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-## Database Setup
+**Important**: Never commit `.env.local` to git. It's already in `.gitignore`.
 
-1. Create a new Supabase project
-2. Run the SQL in `supabase/schema.sql`
-3. Run the SQL in `supabase/rls.sql`
-4. Enable GitHub OAuth in Authentication > Providers
-5. Add your GitHub OAuth credentials
+### 5. Set Up Database
 
-## Development
+**Step 1: Run Schema (Creates tables and basic triggers)**
+
+1. Go to Supabase Dashboard > SQL Editor
+2. Open `supabase/schema.sql` from this repo
+3. Copy the contents and paste into SQL Editor
+4. Click "Run"
+
+**Step 2: Run RLS Policies (Security)**
+
+1. Open `supabase/rls.sql`
+2. Copy the contents and paste into SQL Editor
+3. Click "Run"
+
+**Step 3: Run Optimizations (Performance)**
+
+1. Open `supabase/optimization.sql`
+2. Copy the contents and paste into SQL Editor
+3. Click "Run"
+
+**Step 4: Verify Setup**
+
+Run this query in SQL Editor to verify:
+```sql
+-- Check if tables exist
+SELECT tablename FROM pg_tables WHERE schemaname = 'public';
+
+-- Check if materialized view exists and has data
+SELECT * FROM trending_tags LIMIT 5;
+
+-- If trending_tags is empty, refresh it:
+REFRESH MATERIALIZED VIEW trending_tags;
+```
+
+### 6. Set Up GitHub OAuth
+
+1. Go to GitHub > Settings > Developer Settings > OAuth Apps > New OAuth App
+2. Fill in:
+   - Application name: Stackd (or your app name)
+   - Homepage URL: `http://localhost:3000`
+   - Authorization callback URL: `http://localhost:3000/auth/callback`
+3. Click "Register application"
+4. Copy the Client ID
+5. Generate a new Client Secret
+6. Go to Supabase Dashboard > Authentication > Providers > GitHub
+7. Enable GitHub provider
+8. Paste in your Client ID and Client Secret
+9. Save
+
+### 7. Run Development Server
 
 ```bash
-# Install dependencies
-npm install
-
-# Run development server
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
 
-## Deployment
+### 8. Verify Everything Works
 
-### Vercel
+1. Click "Sign In" and authenticate with GitHub
+2. Create a test post with tags
+3. Check the trending topics widget shows real counts (not "1 Post")
+4. Vote on a post
+5. Add a comment
 
-1. Push to GitHub
-2. Import project on Vercel
-3. Add environment variables
-4. Deploy
+## Deployment to Vercel
 
-### Environment Variables for Production
+### 1. Push to GitHub
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-NEXT_PUBLIC_SITE_URL=https://your-domain.vercel.app
+```bash
+git add .
+git commit -m "Initial commit"
+git push origin main
 ```
+
+### 2. Connect to Vercel
+
+1. Go to [vercel.com](https://vercel.com) and sign in
+2. Click "Add New Project"
+3. Import your GitHub repository
+4. Framework Preset: Next.js
+5. Click "Deploy"
+
+**Note**: The first deploy will fail because environment variables aren't set yet.
+
+### 3. Configure Environment Variables
+
+In Vercel Dashboard > Your Project > Settings > Environment Variables, add:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+NEXT_PUBLIC_SITE_URL=https://your-project.vercel.app
+```
+
+**Important**: 
+- Replace `your-project` with your actual Vercel domain
+- Make sure to add these to Production, Preview, and Development environments
+- Click "Save" after adding all variables
+
+### 4. Update GitHub OAuth Callback URL
+
+1. Go to GitHub > Settings > Developer Settings > OAuth Apps > Your App
+2. Update Authorization callback URL to: `https://your-project.vercel.app/auth/callback`
+3. Save
+
+### 5. Update Supabase Site URL
+
+1. Go to Supabase Dashboard > Authentication > URL Configuration
+2. Set Site URL to: `https://your-project.vercel.app`
+3. Add `https://your-project.vercel.app/auth/callback` to Redirect URLs
+4. Save
+
+### 6. Redeploy
+
+1. Go to Vercel Dashboard > Your Project
+2. Click "Redeploy" (or push a new commit)
+3. Wait for build to complete
+
+### 7. Verify Production Deployment
+
+1. Visit your Vercel URL
+2. Test authentication
+3. Create a post
+4. Verify trending topics show real data
+
+## Database Maintenance
+
+### Refresh Trending Tags Manually
+
+If you need to refresh the trending tags view manually:
+
+```sql
+-- In Supabase SQL Editor
+REFRESH MATERIALIZED VIEW trending_tags;
+
+-- Or use the function:
+SELECT refresh_trending_tags();
+```
+
+### Check Database Status
+
+```sql
+-- View counts
+SELECT 
+  (SELECT COUNT(*) FROM posts) as post_count,
+  (SELECT COUNT(*) FROM profiles) as user_count,
+  (SELECT COUNT(*) FROM comments) as comment_count,
+  (SELECT COUNT(*) FROM votes) as vote_count;
+
+-- Check trending tags
+SELECT * FROM trending_tags ORDER BY count DESC LIMIT 10;
+```
+
+## Troubleshooting
+
+### Build Fails
+
+**Problem**: `npm run build` fails
+
+**Solution**:
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+```
+
+### Trending Topics Shows "1 Post" for All Tags
+
+**Problem**: All trending tags show "1 Post" instead of real counts
+
+**Solution**:
+1. Check if materialized view exists:
+   ```sql
+   SELECT * FROM pg_matviews WHERE matviewname = 'trending_tags';
+   ```
+2. If not found, run `supabase/optimization.sql`
+3. Refresh the view:
+   ```sql
+   REFRESH MATERIALIZED VIEW trending_tags;
+   ```
+4. Verify trigger exists:
+   ```sql
+   SELECT * FROM pg_trigger WHERE tgname = 'refresh_trending_tags_on_change';
+   ```
+
+### Authentication Not Working
+
+**Problem**: Can't sign in with GitHub
+
+**Solution**:
+1. Verify OAuth App callback URL matches your site URL exactly
+2. Check Supabase Auth > Providers > GitHub is enabled
+3. Ensure Client ID and Secret are correct
+4. Check browser console for errors
+
+### Database Connection Errors
+
+**Problem**: "Failed to fetch" or connection errors
+
+**Solution**:
+1. Verify environment variables are set correctly
+2. Check Supabase project is active (not paused)
+3. Ensure RLS policies are set up (run `rls.sql`)
+4. Check if you're using the correct anon key (not service role key for client)
+
+### Account Deletion Fails
+
+**Problem**: "Service role key not configured" error
+
+**Solution**:
+1. Add `SUPABASE_SERVICE_ROLE_KEY` to environment variables
+2. Get it from Supabase Dashboard > Settings > API > service_role key
+3. Never expose this key in client-side code (it's only used server-side)
+
+## Environment Variables Reference
+
+| Variable | Required | Description | Where to Get |
+|----------|----------|-------------|--------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Your Supabase project URL | Supabase Dashboard > Settings > API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Public API key for client | Supabase Dashboard > Settings > API |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Secret key for admin operations | Supabase Dashboard > Settings > API |
+| `NEXT_PUBLIC_SITE_URL` | Yes | Your site's URL | `http://localhost:3000` for dev, Vercel URL for prod |
+
+## Security Considerations
+
+- ✅ RLS policies protect user data
+- ✅ Service role key never exposed to client
+- ✅ Rate limiting prevents spam
+- ✅ XSS protection via DOMPurify
+- ✅ Input validation on all forms
+- ✅ TypeScript for type safety
+
+## Performance Features
+
+- Materialized views for fast aggregations
+- Cached server actions with React cache
+- Optimized database indexes
+- Lazy loading of components
+- Image optimization with Next.js
+- Rate limiting to prevent abuse
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests: `npm run test` (if available)
+5. Submit a pull request
 
 ## License
 
-MIT
+MIT License - feel free to use this for personal or commercial projects.
+
+## Support
+
+If you encounter issues:
+1. Check the Troubleshooting section above
+2. Review the SQL files in `supabase/` directory
+3. Check browser console and server logs
+4. Open an issue on GitHub
+
+---
+
+**Built with ❤️ using Next.js, Supabase, and TailwindCSS**

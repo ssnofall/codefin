@@ -25,7 +25,10 @@ export default async function SettingsPage() {
     .single();
   
   if (profileError || !profile) {
-    console.error('Error fetching profile:', profileError);
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching profile:', profileError);
+    }
     redirect('/feed');
   }
   

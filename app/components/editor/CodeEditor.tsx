@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import Editor from 'react-simple-code-editor';
 import { CopyButton } from '../post/CopyButton';
 
@@ -45,7 +46,13 @@ export function CodeEditor({
           const parser = new DOMParser();
           const doc = parser.parseFromString(html, 'text/html');
           const codeElement = doc.querySelector('code');
-          setHighlighted(codeElement?.innerHTML || '');
+          // Sanitize the extracted HTML to prevent XSS
+          const rawHtml = codeElement?.innerHTML || '';
+          const sanitizedHtml = DOMPurify.sanitize(rawHtml, {
+            ALLOWED_TAGS: ['span'],
+            ALLOWED_ATTR: ['class', 'style'],
+          });
+          setHighlighted(sanitizedHtml);
           setIsLoading(false);
         }
       } catch (err) {

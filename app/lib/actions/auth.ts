@@ -4,6 +4,7 @@ import { createClient } from '../supabase/server';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '../utils/rateLimit';
 
 /**
  * Sign out the current user
@@ -27,6 +28,14 @@ export async function deleteAccount() {
   
   if (userError || !user) {
     throw new Error('You must be logged in to delete your account');
+  }
+  
+  // Check rate limit
+  const rateLimitKey = getRateLimitKey(user.id, 'deleteAccount');
+  const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.deleteAccount);
+  
+  if (rateLimitResult.limited) {
+    throw new Error('Rate limit exceeded. Please try again later.');
   }
   
   // Create a service role client for admin operations
@@ -53,7 +62,10 @@ export async function deleteAccount() {
   const { error: deleteError } = await adminClient.auth.admin.deleteUser(user.id);
   
   if (deleteError) {
-    console.error('Error deleting user:', deleteError);
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error deleting user:', deleteError);
+    }
     throw new Error('Failed to delete account. Please try again later.');
   }
   
