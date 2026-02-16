@@ -160,6 +160,7 @@ export function EditPostModal({ post, isOpen, onClose }: EditPostModalProps) {
               Code <span className="text-destructive">*</span>
             </label>
             <CodeEditor
+              id="edit-code"
               code={code}
               onChange={setCode}
               language={language || 'text'}

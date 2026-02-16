@@ -31,6 +31,8 @@ export function CommentSection({ postId }: CommentSectionProps) {
     <Card>
       <form onSubmit={handleSubmit} className="space-y-4">
         <textarea
+          id="comment-body"
+          name="body"
           value={body}
           onChange={(e) => setBody(e.target.value)}
           placeholder="Add a comment..."

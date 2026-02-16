@@ -6,6 +6,7 @@ import Editor from 'react-simple-code-editor';
 import { CopyButton } from '../post/CopyButton';
 
 interface CodeEditorProps {
+  id?: string;
   code: string;
   onChange: (code: string) => void;
   language: string;
@@ -16,6 +17,7 @@ interface CodeEditorProps {
 }
 
 export function CodeEditor({
+  id,
   code,
   onChange,
   language,
@@ -134,9 +136,10 @@ export function CodeEditor({
       </div>
 
       {/* Hidden input for form submission */}
-      {name && (
+      {(name || id) && (
         <input
           type="hidden"
+          id={id}
           name={name}
           value={code}
           required={required}
