@@ -73,11 +73,21 @@ export async function createClient() {
 export function createStaticClient() {
   // Use service role key during build time to bypass RLS policies
   // Falls back to anon key if service role key is not available
+  const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || 
               process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   
+  // If using service role key, disable auth features since service role
+  // doesn't have refresh tokens and shouldn't auto-refresh
+  const authConfig = hasServiceKey ? {
+    autoRefreshToken: false,
+    persistSession: false,
+    detectSessionInUrl: false
+  } : undefined
+  
   return createSupabaseClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    key
+    key,
+    authConfig ? { auth: authConfig } : undefined
   )
 }
