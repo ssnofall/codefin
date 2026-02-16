@@ -42,6 +42,7 @@ export function CodePreview({ code, language, fileName }: CodePreviewProps) {
           setIsLoading(false);
         }
       } catch (err) {
+        console.error('Shiki highlighting failed:', err);
         if (isMounted) {
           setError(err instanceof Error ? err.message : 'Failed to highlight code');
           setIsLoading(false);
