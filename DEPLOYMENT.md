@@ -6,12 +6,30 @@
 - Vercel account (free tier)
 - GitHub account
 
-## Step 1: Database Setup
+## Step 1: Database Setup (CRITICAL)
+
+**IMPORTANT:** The SQL files must be run in the correct order! Running them out of order will cause errors.
 
 1. Go to https://supabase.com and create a new project
-2. Once created, go to the SQL Editor
-3. Run the contents of `supabase/schema.sql`
-4. Run the contents of `supabase/rls.sql`
+2. Once created, go to the **SQL Editor**
+3. Run the SQL files **IN THIS ORDER**:
+   1. `supabase/00_schema.sql` - Creates tables and indexes
+   2. `supabase/01_rls.sql` - Sets up Row Level Security and the rate_limits table
+   3. `supabase/02_functions.sql` - Creates database functions
+   4. `supabase/03_triggers.sql` - Creates triggers and the trending_tags materialized view
+
+### ⚠️ Critical: Materialized View
+
+The `trending_tags` materialized view in `03_triggers.sql` is **REQUIRED** for the app to work. If it's missing or broken:
+- Post creation will fail
+- Voting will fail
+- The trending page won't work
+
+If you need to fix it manually, run:
+```sql
+-- Fix trending_tags materialized view
+refresh materialized view trending_tags;
+```
 
 ## Step 2: GitHub OAuth Setup
 
@@ -36,22 +54,36 @@
 
 1. In Supabase, go to Project Settings > API
 2. Copy:
-   - Project URL (NEXT_PUBLIC_SUPABASE_URL)
-   - Project API keys > anon public (NEXT_PUBLIC_SUPABASE_ANON_KEY)
+   - Project URL (`NEXT_PUBLIC_SUPABASE_URL`)
+   - Project API keys > anon public (`NEXT_PUBLIC_SUPABASE_ANON_KEY`)
+3. Also copy the **service role key** (keep this secret!): Project API keys > service_role (`SUPABASE_SERVICE_ROLE_KEY`)
+   - This is required for rate limiting to work across Vercel instances
+   - Without it, rate limiting will be disabled (graceful degradation)
 
-## Step 5: Deploy to Vercel
+## Step 5: Environment Variables
+
+Create `.env.local` file for local development:
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+## Step 6: Deploy to Vercel
 
 1. Push your code to GitHub
 2. Go to https://vercel.com
 3. Click "Add New Project"
 4. Import your GitHub repository
 5. Configure environment variables:
-   - NEXT_PUBLIC_SUPABASE_URL
-   - NEXT_PUBLIC_SUPABASE_ANON_KEY
-   - NEXT_PUBLIC_SITE_URL (your Vercel deployment URL)
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_SITE_URL` (your Vercel deployment URL)
+   - `SUPABASE_SERVICE_ROLE_KEY` (for rate limiting)
 6. Click "Deploy"
 
-## Step 6: Update GitHub OAuth Callback
+## Step 7: Update GitHub OAuth Callback
 
 After deployment:
 
@@ -60,7 +92,7 @@ After deployment:
    `https://yourdomain.vercel.app/auth/callback`
 3. Save
 
-## Step 7: Update Supabase Site URL
+## Step 8: Update Supabase Site URL
 
 1. In Supabase, go to Authentication > URL Configuration
 2. Set Site URL to your production URL
@@ -75,17 +107,37 @@ Visit your deployed URL and test:
 3. Vote on posts
 4. Add comments
 5. View profiles
+6. Check the trending tags on the discover page
 
 ## Troubleshooting
 
-**OAuth callback fails:**
+### OAuth callback fails
 - Check that callback URLs match exactly in GitHub OAuth settings and Supabase
 - Ensure NEXT_PUBLIC_SITE_URL is set correctly
 
-**Database errors:**
-- Verify RLS policies are applied
-- Check that tables were created correctly
+### Database errors
+- Verify all 4 SQL files were run in the correct order (00, 01, 02, 03)
+- Check that the `trending_tags` materialized view exists:
+  ```sql
+  select * from trending_tags limit 1;
+  ```
+- Check that the `rate_limits` table exists:
+  ```sql
+  select * from rate_limits limit 1;
+  ```
 
-**Vote not working:**
-- Ensure user is authenticated
-- Check browser console for errors
+### Post creation or voting fails
+- **Most likely cause:** The `trending_tags` materialized view is missing or broken
+- Check browser console for error messages
+- Try refreshing the materialized view manually in SQL Editor:
+  ```sql
+  refresh materialized view trending_tags;
+  ```
+
+### Rate limiting issues
+- If you see `[Rate Limit] Service role key not configured` in logs, add `SUPABASE_SERVICE_ROLE_KEY` to your environment variables
+- Rate limiting gracefully degrades (allows all requests) if the service role key is missing
+
+### Comments work but posts/voting don't
+- This is a clear sign the `trending_tags` materialized view trigger is failing
+- Run `supabase/03_triggers.sql` again in the SQL Editor

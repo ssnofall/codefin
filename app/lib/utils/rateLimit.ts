@@ -85,6 +85,8 @@ export async function checkRateLimit(
 
     if (!supabase) {
       // Graceful fallback - allow request through if admin client unavailable
+      // This happens when SUPABASE_SERVICE_ROLE_KEY is not set
+      console.warn('[Rate Limit] Service role key not configured - rate limiting disabled. Set SUPABASE_SERVICE_ROLE_KEY to enable.')
       return { limited: false, remaining: opts.maxRequests, resetTime: windowEnd.getTime() }
     }
 

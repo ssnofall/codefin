@@ -147,7 +147,9 @@ Run the SQL files in order in the Supabase SQL Editor:
 2. Copy the contents and paste into SQL Editor
 3. Click "Run"
 
-**Step 5: Verify Setup**
+**Step 5: Verify Setup (CRITICAL)**
+
+**⚠️ The `trending_tags` materialized view MUST exist and work correctly, or post creation and voting will fail.**
 
 Run this query in SQL Editor to verify:
 ```sql
@@ -157,9 +159,14 @@ SELECT tablename FROM pg_tables WHERE schemaname = 'public';
 -- Check if materialized view exists and has data
 SELECT * FROM trending_tags LIMIT 5;
 
--- If trending_tags is empty, refresh it:
-REFRESH MATERIALIZED VIEW CONCURRENTLY trending_tags;
+-- If trending_tags is empty or missing, fix it:
+REFRESH MATERIALIZED VIEW trending_tags;
 ```
+
+**If you get errors when creating posts or voting:**
+1. Check if the trigger exists: `SELECT * FROM pg_trigger WHERE tgname = 'refresh_trending_tags_on_change';`
+2. If missing, re-run `supabase/03_triggers.sql`
+3. Refresh the view manually: `REFRESH MATERIALIZED VIEW trending_tags;`
 
 ### 6. Set Up GitHub OAuth
 
@@ -327,6 +334,38 @@ npm run build
    ```sql
    SELECT * FROM pg_trigger WHERE tgname = 'refresh_trending_tags_on_change';
    ```
+
+### Comments Work But Posts/Voting Don't
+
+**Problem**: You can add comments successfully, but creating posts or voting fails
+
+**Root Cause**: The `trending_tags` materialized view trigger is failing. Comments work because they don't trigger the materialized view refresh.
+
+**Solution**:
+1. Check the materialized view exists:
+   ```sql
+   SELECT * FROM pg_matviews WHERE matviewname = 'trending_tags';
+   ```
+2. If missing or broken, re-run `supabase/03_triggers.sql` in order:
+   - First run `00_schema.sql` (if tables don't exist)
+   - Then run `01_rls.sql`
+   - Then run `02_functions.sql`
+   - Finally run `03_triggers.sql`
+3. Refresh the view:
+   ```sql
+   REFRESH MATERIALIZED VIEW trending_tags;
+   ```
+4. Check for trigger errors in Supabase Logs (Database > Logs)
+
+### Rate Limiting Not Working
+
+**Problem**: `[Rate Limit] Service role key not configured` appears in logs
+
+**Solution**:
+1. Add `SUPABASE_SERVICE_ROLE_KEY` to your environment variables
+2. Get it from Supabase Dashboard > Settings > API > service_role key
+3. Restart your dev server or redeploy to Vercel
+4. Note: Rate limiting gracefully degrades (allows all requests) if the key is missing - this is expected behavior
 
 ### Authentication Not Working
 

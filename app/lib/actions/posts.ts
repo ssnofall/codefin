@@ -251,10 +251,11 @@ export async function createPost(formData: FormData): Promise<void> {
 }
 
 // Optimized trending tags using materialized view with auto-refresh trigger
-// The materialized view 'trending_tags' is created in supabase/optimization.sql
+// The materialized view 'trending_tags' is created in supabase/03_triggers.sql
 // It pre-aggregates tag counts from posts in the last 30 days for fast queries
 // Auto-refresh trigger ensures data stays current when posts are created/updated/deleted
 // Falls back to JavaScript aggregation if view doesn't exist
+// CRITICAL: If this view or its trigger is broken, post creation and voting will fail
 export const getTrendingTags = cache(async () => {
   // Use static client since this doesn't require authentication
   const supabase = createStaticClient()
