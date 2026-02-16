@@ -256,67 +256,82 @@ export async function createPost(formData: FormData): Promise<void> {
 // Auto-refresh trigger ensures data stays current when posts are created/updated/deleted
 // Falls back to JavaScript aggregation if view doesn't exist
 export const getTrendingTags = cache(async () => {
-  // Use static client since this doesn't require authentication
-  const supabase = createStaticClient()
-  
-  // Try to use materialized view first (much faster - O(1) vs O(n) scanning)
   try {
-    const { data: viewData, error: viewError } = await supabase
-      .from('trending_tags')
-      .select('tag, count')
-      .limit(10)
+    // Use static client since this doesn't require authentication
+    const supabase = createStaticClient()
     
-    if (!viewError && viewData) {
-      return viewData
+    // Try to use materialized view first (much faster - O(1) vs O(n) scanning)
+    try {
+      const { data: viewData, error: viewError } = await supabase
+        .from('trending_tags')
+        .select('tag, count')
+        .limit(10)
+      
+      if (!viewError && viewData) {
+        return viewData as TrendingTag[]
+      }
+    } catch {
+      // Materialized view doesn't exist, fall back to regular query
     }
-  } catch {
-    // Materialized view doesn't exist, fall back to regular query
-  }
-  
-  // Fallback: Only fetch posts from last 30 days for trending
-  const thirtyDaysAgo = new Date()
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-  
-  const { data, error } = await supabase
-    .from('posts')
-    .select('tags')
-    .gte('created_at', thirtyDaysAgo.toISOString())
-    .limit(1000) // Limit to recent 1000 posts
-  
-  if (error) throw error
-  
-  const tagCounts: Record<string, number> = {}
-  // Type-safe iteration over query results
-  interface PostWithTags {
-    tags: string[] | null
-  }
-  const posts = (data || []) as PostWithTags[]
-  posts.forEach((post) => {
-    if (post.tags && Array.isArray(post.tags)) {
-      post.tags.forEach((tag: string) => {
-        tagCounts[tag] = (tagCounts[tag] || 0) + 1
-      })
+    
+    // Fallback: Only fetch posts from last 30 days for trending
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    
+    const { data, error } = await supabase
+      .from('posts')
+      .select('tags')
+      .gte('created_at', thirtyDaysAgo.toISOString())
+      .limit(1000) // Limit to recent 1000 posts
+    
+    if (error) throw error
+    
+    const tagCounts: Record<string, number> = {}
+    // Type-safe iteration over query results
+    interface PostWithTags {
+      tags: string[] | null
     }
-  })
-  
-  return Object.entries(tagCounts)
-    .map(([tag, count]) => ({ tag, count: Number(count) }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10)
+    const posts = (data || []) as PostWithTags[]
+    posts.forEach((post) => {
+      if (post.tags && Array.isArray(post.tags)) {
+        post.tags.forEach((tag: string) => {
+          tagCounts[tag] = (tagCounts[tag] || 0) + 1
+        })
+      }
+    })
+    
+    return Object.entries(tagCounts)
+      .map(([tag, count]) => ({ tag, count: Number(count) }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10)
+  } catch (error) {
+    console.error('Error fetching trending tags:', error)
+    // Return empty array during build if database is not accessible
+    return [] as TrendingTag[]
+  }
 })
 
 export const getPlatformStats = cache(async () => {
-  // Use static client since this doesn't require authentication
-  const supabase = createStaticClient()
-  
-  const [{ count: postCount }, { count: userCount }] = await Promise.all([
-    supabase.from('posts').select('*', { count: 'exact', head: true }),
-    supabase.from('profiles').select('*', { count: 'exact', head: true }),
-  ])
-  
-  return {
-    posts: postCount || 0,
-    users: userCount || 0,
+  try {
+    // Use static client since this doesn't require authentication
+    const supabase = createStaticClient()
+    
+    const [{ count: postCount }, { count: userCount }] = await Promise.all([
+      supabase.from('posts').select('*', { count: 'exact', head: true }),
+      supabase.from('profiles').select('*', { count: 'exact', head: true }),
+    ])
+    
+    return {
+      posts: postCount || 0,
+      users: userCount || 0,
+    }
+  } catch (error) {
+    console.error('Error fetching platform stats:', error)
+    // Return default values during build if database is not accessible
+    return {
+      posts: 0,
+      users: 0,
+    }
   }
 })
 
@@ -348,36 +363,42 @@ export const getUserVotesForPosts = cache(async (postIds: string[]) => {
 
 // Get language distribution across all posts
 export const getLanguageDistribution = cache(async () => {
-  // Use static client since this doesn't require authentication
-  const supabase = createStaticClient()
-  
-  const { data, error } = await supabase
-    .from('posts')
-    .select('language')
-  
-  if (error) throw error
-  
-  const languageCounts: Record<string, number> = {}
-  // Type-safe iteration
-  interface PostWithLanguage {
-    language: string
-  }
-  const posts = (data || []) as PostWithLanguage[]
-  posts.forEach((post) => {
-    if (post.language) {
-      languageCounts[post.language] = (languageCounts[post.language] || 0) + 1
+  try {
+    // Use static client since this doesn't require authentication
+    const supabase = createStaticClient()
+    
+    const { data, error } = await supabase
+      .from('posts')
+      .select('language')
+    
+    if (error) throw error
+    
+    const languageCounts: Record<string, number> = {}
+    // Type-safe iteration
+    interface PostWithLanguage {
+      language: string
     }
-  })
-  
-  const total = posts.length || 1
-  
-  return Object.entries(languageCounts)
-    .map(([language, count]) => ({
-      language,
-      percentage: Math.round((count / total) * 100),
-    }))
-    .sort((a, b) => b.percentage - a.percentage)
-    .slice(0, 5)
+    const posts = (data || []) as PostWithLanguage[]
+    posts.forEach((post) => {
+      if (post.language) {
+        languageCounts[post.language] = (languageCounts[post.language] || 0) + 1
+      }
+    })
+    
+    const total = posts.length || 1
+    
+    return Object.entries(languageCounts)
+      .map(([language, count]) => ({
+        language,
+        percentage: Math.round((count / total) * 100),
+      }))
+      .sort((a, b) => b.percentage - a.percentage)
+      .slice(0, 5)
+  } catch (error) {
+    console.error('Error fetching language distribution:', error)
+    // Return empty array during build if database is not accessible
+    return [] as { language: string; percentage: number }[]
+  }
 })
 
 export async function updatePost(postId: string, formData: FormData): Promise<Tables<'posts'>> {

@@ -71,8 +71,13 @@ export async function createClient() {
 
 // Client for static generation (doesn't use cookies)
 export function createStaticClient() {
+  // Use service role key during build time to bypass RLS policies
+  // Falls back to anon key if service role key is not available
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+              process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  
   return createSupabaseClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    key
   )
 }
