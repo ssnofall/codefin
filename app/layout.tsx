@@ -9,6 +9,7 @@ import { BottomNav } from "./components/layout/BottomNav";
 import { Footer } from "./components/layout/Footer";
 import { createClient } from "./lib/supabase/server";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 
 const inter = Inter({
@@ -121,6 +122,7 @@ export default function RootLayout({
           {/* Footer */}
           <Footer />
         </ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
