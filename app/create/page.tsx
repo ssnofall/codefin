@@ -42,7 +42,7 @@ export default function CreatePostPage() {
 
     try {
       await createPost(formData);
-      router.push('/feed');
+      router.replace('/feed');
       router.refresh();
     } catch (error) {
       alert('Failed to create post. Please try again.');
