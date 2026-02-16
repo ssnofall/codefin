@@ -6,21 +6,36 @@
 - Vercel account (free tier)
 - GitHub account
 
-## Step 1: Database Setup (CRITICAL)
+## Step 1: Database Setup (CRITICAL - DO THIS FIRST!)
 
-**IMPORTANT:** The SQL files must be run in the correct order! Running them out of order will cause errors.
+**⚠️ COMMON ERROR:** If you see `relation "posts" does not exist`, you haven't run the database setup!
+
+### Option A: Quick Setup (Recommended for new projects)
+
+Run the complete setup in one go:
 
 1. Go to https://supabase.com and create a new project
 2. Once created, go to the **SQL Editor**
-3. Run the SQL files **IN THIS ORDER**:
-   1. `supabase/00_schema.sql` - Creates tables and indexes
-   2. `supabase/01_rls.sql` - Sets up Row Level Security and the rate_limits table
-   3. `supabase/02_functions.sql` - Creates database functions
-   4. `supabase/03_triggers.sql` - Creates triggers and the trending_tags materialized view
+3. Click **"New Query"**
+4. Open `supabase/complete_setup.sql` from this repo
+5. Copy the entire contents and paste into the SQL Editor
+6. Click **"Run"**
+7. Check the output - you should see:
+   - `Database setup complete!`
+   - Table count, trigger count, and materialized view count
+
+### Option B: Step-by-Step Setup
+
+If you prefer to run files individually, run them in this exact order:
+
+1. `supabase/00_schema.sql` - Creates tables and indexes
+2. `supabase/01_rls.sql` - Sets up Row Level Security
+3. `supabase/02_functions.sql` - Creates database functions
+4. `supabase/03_triggers.sql` - Creates triggers and materialized view
 
 ### ⚠️ Critical: Materialized View
 
-The `trending_tags` materialized view in `03_triggers.sql` is **REQUIRED** for the app to work. If it's missing or broken:
+The `trending_tags` materialized view is **REQUIRED** for the app to work. If it's missing or broken:
 - Post creation will fail
 - Voting will fail
 - The trending page won't work
@@ -110,6 +125,38 @@ Visit your deployed URL and test:
 6. Check the trending tags on the discover page
 
 ## Troubleshooting
+
+### "Invalid API key" Error
+
+**Error:** `Rate limit fetch error: Invalid API key`
+
+**Cause:** Your `SUPABASE_SERVICE_ROLE_KEY` is wrong or missing
+
+**Solution:**
+1. Go to Supabase Dashboard > Project Settings > API
+2. Copy the **service_role** key (NOT the anon key!)
+3. Add it to your `.env.local` file:
+   ```
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
+   ```
+4. Restart your dev server or redeploy to Vercel
+
+**Note:** The app will still work without this key - rate limiting just gets disabled (graceful degradation).
+
+### "relation 'posts' does not exist" Error
+
+**Error:** `Error upserting vote: relation "posts" does not exist`
+
+**Cause:** You haven't run the database setup SQL files
+
+**Solution:**
+1. Go to Supabase Dashboard > SQL Editor
+2. Run `supabase/complete_setup.sql` (or all 4 SQL files in order)
+3. Verify tables were created:
+   ```sql
+   select tablename from pg_tables where schemaname = 'public';
+   ```
+   You should see: `profiles`, `posts`, `votes`, `comments`, `rate_limits`
 
 ### OAuth callback fails
 - Check that callback URLs match exactly in GitHub OAuth settings and Supabase
