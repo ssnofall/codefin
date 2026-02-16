@@ -1,175 +1,119 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+/**
+ * Simple in-memory rate limiter for server actions
+ * For production with multiple instances, use Redis (e.g., Upstash)
+ */
 
-interface RateLimitOptions {
-  windowMs: number
-  maxRequests: number
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
 }
 
-interface RateLimitRow {
-  id: string
-  identifier: string
-  action: string
-  count: number
-  window_start: string
-  created_at: string
+// In-memory store (resets on server restart)
+const rateLimitStore = new Map<string, RateLimitEntry>();
+
+interface RateLimitOptions {
+  windowMs: number;  // Time window in milliseconds
+  maxRequests: number;  // Max requests per window
 }
 
 const DEFAULT_OPTIONS: RateLimitOptions = {
-  windowMs: 60 * 1000,
+  windowMs: 60 * 1000, // 1 minute
   maxRequests: 10,
-}
+};
 
-async function getAdminClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+/**
+ * Check if request is rate limited
+ * Returns { limited: boolean, remaining: number, resetTime: number }
+ */
+export function checkRateLimit(
+  identifier: string,
+  options: Partial<RateLimitOptions> = {}
+): { limited: boolean; remaining: number; resetTime: number } {
+  const opts = { ...DEFAULT_OPTIONS, ...options };
+  const now = Date.now();
+  const key = `${identifier}:${Math.floor(now / opts.windowMs)}`;
 
-  if (!supabaseUrl || !serviceRoleKey) {
-    return null
+  const entry = rateLimitStore.get(key);
+
+  if (!entry) {
+    // First request in this window
+    rateLimitStore.set(key, {
+      count: 1,
+      resetTime: now + opts.windowMs,
+    });
+
+    // Cleanup old entries periodically
+    cleanupOldEntries(now, opts.windowMs);
+
+    return {
+      limited: false,
+      remaining: opts.maxRequests - 1,
+      resetTime: now + opts.windowMs,
+    };
   }
 
-  const cookieStore = await cookies()
-
-  return createServerClient(supabaseUrl, serviceRoleKey, {
-    cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value
-      },
-      set() {
-        // No-op - service role client doesn't need cookies
-      },
-      remove() {
-        // No-op - service role client doesn't need cookies
-      },
-    },
-  })
-}
-
-function getWindowStart(windowMs: number): Date {
-  const now = new Date()
-  const windowSize = Math.floor(now.getTime() / windowMs)
-  return new Date(windowSize * windowMs)
-}
-
-function extractActionFromKey(key: string): string {
-  const parts = key.split(':')
-  if (parts.length >= 3) {
-    return parts.slice(2, -1).join(':') || parts[2]
-  }
-  return key
-}
-
-export async function checkRateLimit(
-  key: string,
-  optionsOrAction: string | Partial<RateLimitOptions>,
-  options?: Partial<RateLimitOptions>
-): Promise<{ limited: boolean; remaining: number; resetTime: number }> {
-  let opts: RateLimitOptions
-  let action: string
-
-  if (typeof optionsOrAction === 'string') {
-    action = optionsOrAction
-    opts = { ...DEFAULT_OPTIONS, ...options }
-  } else {
-    action = extractActionFromKey(key)
-    opts = { ...DEFAULT_OPTIONS, ...optionsOrAction }
+  if (entry.count >= opts.maxRequests) {
+    return {
+      limited: true,
+      remaining: 0,
+      resetTime: entry.resetTime,
+    };
   }
 
-  const identifier = key
-  const now = Date.now()
-  const windowStart = getWindowStart(opts.windowMs)
-  const windowEnd = new Date(windowStart.getTime() + opts.windowMs)
+  entry.count++;
+  return {
+    limited: false,
+    remaining: opts.maxRequests - entry.count,
+    resetTime: entry.resetTime,
+  };
+}
 
-  try {
-    const supabase = await getAdminClient()
+/**
+ * Cleanup old rate limit entries to prevent memory leaks
+ */
+function cleanupOldEntries(now: number, windowMs: number): void {
+  const cutoff = now - windowMs * 2; // Keep entries for 2 windows
 
-    if (!supabase) {
-      // Graceful fallback - allow request through if admin client unavailable
-      // This happens when SUPABASE_SERVICE_ROLE_KEY is not set
-      console.warn('[Rate Limit] Service role key not configured - rate limiting disabled. Set SUPABASE_SERVICE_ROLE_KEY to enable.')
-      return { limited: false, remaining: opts.maxRequests, resetTime: windowEnd.getTime() }
+  for (const [key, entry] of rateLimitStore.entries()) {
+    if (entry.resetTime < cutoff) {
+      rateLimitStore.delete(key);
     }
-
-    const { data: existing, error: fetchError } = await (supabase
-      .from('rate_limits') as any)
-      .select('count')
-      .eq('identifier', identifier)
-      .eq('action', action)
-      .gte('window_start', windowStart.toISOString())
-      .single()
-
-    if (fetchError && fetchError.code !== 'PGRST116') {
-      console.error('Rate limit fetch error:', fetchError)
-      return { limited: false, remaining: opts.maxRequests, resetTime: windowEnd.getTime() }
-    }
-
-    if (existing) {
-      if (existing.count >= opts.maxRequests) {
-        return { limited: true, remaining: 0, resetTime: windowEnd.getTime() }
-      }
-
-      const { error: updateError } = await (supabase
-        .from('rate_limits') as any)
-        .update({ count: existing.count + 1 })
-        .eq('identifier', identifier)
-        .eq('action', action)
-        .gte('window_start', windowStart.toISOString())
-
-      if (updateError) {
-        console.error('Rate limit update error:', updateError)
-        return { limited: false, remaining: opts.maxRequests, resetTime: windowEnd.getTime() }
-      }
-
-      return {
-        limited: false,
-        remaining: opts.maxRequests - (existing.count + 1),
-        resetTime: windowEnd.getTime(),
-      }
-    } else {
-      const { error: insertError } = await (supabase
-        .from('rate_limits') as any)
-        .insert({
-          identifier,
-          action,
-          count: 1,
-          window_start: windowStart.toISOString(),
-        })
-
-      if (insertError) {
-        console.error('Rate limit insert error:', insertError)
-        return { limited: false, remaining: opts.maxRequests, resetTime: windowEnd.getTime() }
-      }
-
-      return {
-        limited: false,
-        remaining: opts.maxRequests - 1,
-        resetTime: windowEnd.getTime(),
-      }
-    }
-  } catch (error) {
-    console.error('Rate limit check failed:', error)
-    // Graceful fallback - allow request through on any error
-    return { limited: false, remaining: opts.maxRequests, resetTime: windowEnd.getTime() }
   }
 }
 
+/**
+ * Get rate limit key for a user action
+ */
 export function getRateLimitKey(
   userId: string | null,
   action: string,
   resourceId?: string
 ): string {
   if (userId) {
-    return resourceId
+    return resourceId 
       ? `user:${userId}:${action}:${resourceId}`
-      : `user:${userId}:${action}`
+      : `user:${userId}:${action}`;
   }
-  return `anon:${action}:${resourceId || 'global'}`
+  // For anonymous users, we'll need to use IP (passed from middleware)
+  return `anon:${action}:${resourceId || 'global'}`;
 }
 
+/**
+ * Rate limit configurations for different actions
+ */
 export const RATE_LIMITS = {
-  createPost: { windowMs: 60 * 60 * 1000, maxRequests: 3 },
+  // Posts: 5 per hour
+  createPost: { windowMs: 60 * 60 * 1000, maxRequests: 5 },
+  
+  // Comments: 10 per hour  
   createComment: { windowMs: 60 * 60 * 1000, maxRequests: 10 },
-  vote: { windowMs: 10 * 1000, maxRequests: 1 },
+  
+  // Votes: 1 per 5 seconds per post
+  vote: { windowMs: 5 * 1000, maxRequests: 1 },
+  
+  // Account deletion: 1 per hour
   deleteAccount: { windowMs: 60 * 60 * 1000, maxRequests: 1 },
+  
+  // General API calls: 60 per minute
   general: { windowMs: 60 * 1000, maxRequests: 60 },
-} as const
+} as const;

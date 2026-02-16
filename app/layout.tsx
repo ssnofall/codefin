@@ -9,7 +9,6 @@ import { BottomNav } from "./components/layout/BottomNav";
 import { Footer } from "./components/layout/Footer";
 import { createClient } from "./lib/supabase/server";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
-import { Analytics } from "@vercel/analytics/next";
 
 
 const inter = Inter({
@@ -122,7 +121,6 @@ export default function RootLayout({
           {/* Footer */}
           <Footer />
         </ThemeProvider>
-        <Analytics />
       </body>
     </html>
   );

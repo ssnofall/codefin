@@ -32,7 +32,7 @@ export async function deleteAccount() {
   
   // Check rate limit
   const rateLimitKey = getRateLimitKey(user.id, 'deleteAccount');
-  const rateLimitResult = await checkRateLimit(rateLimitKey, RATE_LIMITS.deleteAccount);
+  const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.deleteAccount);
   
   if (rateLimitResult.limited) {
     throw new Error('Rate limit exceeded. Please try again later.');

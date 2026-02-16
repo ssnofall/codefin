@@ -35,37 +35,18 @@ end;
 $$ language plpgsql security definer set search_path = pg_catalog;
 
 -- Refresh trending tags materialized view
--- This function can be called manually to refresh the view
 create or replace function public.refresh_trending_tags()
 returns void as $$
 begin
-  -- Use concurrent refresh to avoid locking the view during refresh
-  -- This requires the unique index idx_trending_tags_unique_tag
   refresh materialized view concurrently trending_tags;
-exception
-  when others then
-    -- Fallback to regular refresh if concurrent fails
-    -- This can happen on first refresh or if unique index is missing
-    refresh materialized view trending_tags;
 end;
 $$ language plpgsql set search_path = pg_catalog;
 
 -- Auto-refresh trending tags on post change
--- This trigger is called after any post INSERT/UPDATE/DELETE
--- CRITICAL: Errors here will cause post operations to fail
 create or replace function public.refresh_trending_tags_trigger()
 returns trigger as $$
 begin
-  -- Attempt concurrent refresh first (non-blocking)
-  -- If that fails, fall back to regular refresh
-  begin
-    refresh materialized view concurrently trending_tags;
-  exception
-    when others then
-      -- Fallback to regular refresh if concurrent fails
-      -- This ensures posts can still be created even if the view has issues
-      refresh materialized view trending_tags;
-  end;
+  refresh materialized view concurrently trending_tags;
   return null;
 end;
 $$ language plpgsql set search_path = pg_catalog;

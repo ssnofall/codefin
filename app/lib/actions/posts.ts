@@ -199,7 +199,7 @@ export async function createPost(formData: FormData): Promise<void> {
     
     // Check rate limit
     const rateLimitKey = getRateLimitKey(user.id, 'createPost')
-    const rateLimitResult = await checkRateLimit(rateLimitKey, RATE_LIMITS.createPost)
+    const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.createPost)
     
     if (rateLimitResult.limited) {
       throw new Error(`Rate limit exceeded. Please try again later.`)
@@ -251,11 +251,10 @@ export async function createPost(formData: FormData): Promise<void> {
 }
 
 // Optimized trending tags using materialized view with auto-refresh trigger
-// The materialized view 'trending_tags' is created in supabase/03_triggers.sql
+// The materialized view 'trending_tags' is created in supabase/optimization.sql
 // It pre-aggregates tag counts from posts in the last 30 days for fast queries
 // Auto-refresh trigger ensures data stays current when posts are created/updated/deleted
 // Falls back to JavaScript aggregation if view doesn't exist
-// CRITICAL: If this view or its trigger is broken, post creation and voting will fail
 export const getTrendingTags = cache(async () => {
   // Use static client since this doesn't require authentication
   const supabase = createStaticClient()
@@ -414,7 +413,7 @@ export async function updatePost(postId: string, formData: FormData): Promise<Ta
     
     // Check rate limit
     const rateLimitKey = getRateLimitKey(user.id, 'updatePost', postId)
-    const rateLimitResult = await checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 5 })
+    const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 5 })
     
     if (rateLimitResult.limited) {
       throw new Error(`Rate limit exceeded. Please try again later.`)
@@ -530,7 +529,7 @@ export async function deletePost(postId: string): Promise<void> {
     
     // Check rate limit
     const rateLimitKey = getRateLimitKey(user.id, 'deletePost')
-    const rateLimitResult = await checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
+    const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
     
     if (rateLimitResult.limited) {
       throw new Error(`Rate limit exceeded. Please try again later.`)
