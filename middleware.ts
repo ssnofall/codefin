@@ -10,7 +10,6 @@ export async function middleware(request: NextRequest) {
   // Build comprehensive CSP header
   // - nonce: for inline scripts we control (theme script)
   // - strict-dynamic: allows scripts loaded by nonced scripts to execute
-  // - wasm-unsafe-eval: required for Shiki syntax highlighting (WebAssembly)
   // - unsafe-eval: only in development for React debugging
   // - unsafe-inline for styles: allows inline styles (low risk, commonly needed)
   const cspHeader = `
@@ -24,7 +23,6 @@ export async function middleware(request: NextRequest) {
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'none';
-    wasm-unsafe-eval;
     upgrade-insecure-requests;
   `.replace(/\s+/g, ' ').trim();
 
