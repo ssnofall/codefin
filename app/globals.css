@@ -279,3 +279,74 @@ html {
     overscroll-behavior-y: none;
   }
 }
+
+/* Shiki CSS-based Syntax Highlighting - CSP Compliant */
+/* These classes replace inline styles to comply with strict CSP */
+
+.shiki-pre {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.shiki-code {
+  background: transparent !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.shiki-token {
+  /* Base token styles */
+}
+
+/* Syntax highlighting colors - GitHub Dark theme */
+.shiki-red {
+  color: #ff7b72;
+}
+
+.shiki-blue {
+  color: #79c0ff;
+}
+
+.shiki-yellow {
+  color: #e3b341;
+}
+
+.shiki-green {
+  color: #7ee787;
+}
+
+.shiki-purple {
+  color: #d2a8ff;
+}
+
+.shiki-pink {
+  color: #ffa198;
+}
+
+.shiki-magenta {
+  color: #ff9bce;
+}
+
+.shiki-lime {
+  color: #56d364;
+}
+
+.shiki-light-red {
+  color: #ffdcd7;
+}
+
+.shiki-white {
+  color: #c9d1d9;
+}
+
+.shiki-gray {
+  color: #8b949e;
+}
+
+.shiki-orange {
+  color: #f0883e;
+}
+
+.shiki-default {
+  color: #c9d1d9;
+}

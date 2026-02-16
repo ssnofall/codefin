@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Suspense } from "react";
+import { headers } from "next/headers";
 import "./globals.css";
 import { LeftSidebar } from "./components/layout/LeftSidebar";
 import { RightSidebar } from "./components/layout/RightSidebar";
@@ -10,6 +11,7 @@ import { Footer } from "./components/layout/Footer";
 import { createClient } from "./lib/supabase/server";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { isValidNonce } from "./lib/utils/security";
 
 
 const inter = Inter({
@@ -51,15 +53,23 @@ async function BottomNavWithUser() {
   return <BottomNav user={user} />;
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Get nonce from middleware-generated headers for CSP compliance
+  const headersList = await headers();
+  const nonce = headersList.get('x-nonce') || undefined;
+
+  // Validate nonce for security
+  const validNonce = nonce && isValidNonce(nonce) ? nonce : undefined;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script
+          nonce={validNonce}
           dangerouslySetInnerHTML={{
             __html: `
               (function() {

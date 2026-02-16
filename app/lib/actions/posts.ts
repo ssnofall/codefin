@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { Tables, TablesInsert } from '../supabase/types'
 import { validateId, validateTag, validateLanguage } from '../utils/validation'
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '../utils/rateLimit'
+import { sanitizeErrorMessage } from '../utils/security'
 import {
   MAX_TITLE_LENGTH,
   MAX_CODE_LENGTH,
@@ -184,7 +185,7 @@ export async function createPost(formData: FormData): Promise<void> {
       
       if (authError) {
         console.error('Auth error in createPost:', authError.message, authError)
-        throw new Error(`Authentication failed: ${authError.message}`)
+        throw new Error('Authentication failed. Please sign in again.')
       }
       
       user = authUser
@@ -199,7 +200,7 @@ export async function createPost(formData: FormData): Promise<void> {
     
     // Check rate limit
     const rateLimitKey = getRateLimitKey(user.id, 'createPost')
-    const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.createPost)
+    const rateLimitResult = await checkRateLimit(rateLimitKey, RATE_LIMITS.createPost)
     
     if (rateLimitResult.limited) {
       throw new Error(`Rate limit exceeded. Please try again later.`)
@@ -232,7 +233,7 @@ export async function createPost(formData: FormData): Promise<void> {
       
       if (error) {
         console.error('Database error in createPost:', error)
-        throw new Error(`Failed to create post: ${error.message}`)
+        throw new Error('Failed to create post. Please try again.')
       }
     } catch (dbError) {
       console.error('Database operation failed in createPost:', dbError)
@@ -403,7 +404,7 @@ export async function updatePost(postId: string, formData: FormData): Promise<Ta
       
       if (authError) {
         console.error('Auth error in updatePost:', authError.message, authError)
-        throw new Error(`Authentication failed: ${authError.message}`)
+        throw new Error('Authentication failed. Please sign in again.')
       }
       
       user = authUser
@@ -418,7 +419,7 @@ export async function updatePost(postId: string, formData: FormData): Promise<Ta
     
     // Check rate limit
     const rateLimitKey = getRateLimitKey(user.id, 'updatePost', postId)
-    const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 5 })
+    const rateLimitResult = await checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 5 })
     
     if (rateLimitResult.limited) {
       throw new Error(`Rate limit exceeded. Please try again later.`)
@@ -473,7 +474,7 @@ export async function updatePost(postId: string, formData: FormData): Promise<Ta
 
       if (error) {
         console.error('Database error in updatePost:', error)
-        throw new Error(`Failed to update post: ${error.message}`)
+        throw new Error('Failed to update post. Please try again.')
       }
 
       if (!data) {
@@ -519,7 +520,7 @@ export async function deletePost(postId: string): Promise<void> {
       
       if (authError) {
         console.error('Auth error in deletePost:', authError.message, authError)
-        throw new Error(`Authentication failed: ${authError.message}`)
+        throw new Error('Authentication failed. Please sign in again.')
       }
       
       user = authUser
@@ -534,7 +535,7 @@ export async function deletePost(postId: string): Promise<void> {
     
     // Check rate limit
     const rateLimitKey = getRateLimitKey(user.id, 'deletePost')
-    const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
+    const rateLimitResult = await checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
     
     if (rateLimitResult.limited) {
       throw new Error(`Rate limit exceeded. Please try again later.`)
@@ -565,7 +566,7 @@ export async function deletePost(postId: string): Promise<void> {
       
       if (commentsError) {
         console.error('Error deleting comments:', commentsError)
-        throw new Error(`Failed to delete comments: ${commentsError.message}`)
+        throw new Error('Failed to delete comments. Please try again.')
       }
       
       // Delete votes
@@ -576,7 +577,7 @@ export async function deletePost(postId: string): Promise<void> {
       
       if (votesError) {
         console.error('Error deleting votes:', votesError)
-        throw new Error(`Failed to delete votes: ${votesError.message}`)
+        throw new Error('Failed to delete votes. Please try again.')
       }
       
       // Delete post
@@ -588,7 +589,7 @@ export async function deletePost(postId: string): Promise<void> {
       
       if (postError) {
         console.error('Error deleting post:', postError)
-        throw new Error(`Failed to delete post: ${postError.message}`)
+        throw new Error('Failed to delete post. Please try again.')
       }
     } catch (dbError) {
       console.error('Database operation failed in deletePost:', dbError)

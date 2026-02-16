@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Removed output: 'standalone' for standard Vercel deployment
+  // Standard Vercel deployment configuration
   images: {
     remotePatterns: [
       {
@@ -13,7 +13,8 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
-  // Add security headers
+  // Security headers are now handled by middleware.ts for dynamic nonce generation
+  // These headers serve as a fallback for static assets not processed by middleware
   async headers() {
     return [
       {
@@ -30,10 +31,6 @@ const nextConfig: NextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://*.githubusercontent.com data:; connect-src 'self' https://*.supabase.co; font-src 'self';"
           },
           {
             key: 'X-DNS-Prefetch-Control',

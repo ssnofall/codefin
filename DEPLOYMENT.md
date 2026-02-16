@@ -1,91 +1,289 @@
-# Stackd MVP - Deployment Guide
+# Stackd - Deployment Guide
+
+Complete guide for deploying Stackd to production on Vercel with full security hardening.
 
 ## Prerequisites
 
 - Supabase account (free tier)
 - Vercel account (free tier)
 - GitHub account
+- Upstash account (free tier - for Redis rate limiting)
 
-## Step 1: Database Setup
+## Pre-Deployment Security Checklist
 
-1. Go to https://supabase.com and create a new project
-2. Once created, go to the SQL Editor
-3. Run the contents of `supabase/schema.sql`
-4. Run the contents of `supabase/rls.sql`
+Before deploying, complete all items below:
 
-## Step 2: GitHub OAuth Setup
+### 1. Environment Variables Setup
 
-1. Go to GitHub Settings > Developer settings > OAuth Apps
-2. Click "New OAuth App"
-3. Fill in:
-   - Application name: Stackd
-   - Homepage URL: http://localhost:3000 (for dev) or your Vercel URL
-   - Authorization callback URL: http://localhost:3000/auth/callback (for dev) or https://yourdomain.vercel.app/auth/callback
-4. Click "Register application"
-5. Copy the Client ID
-6. Click "Generate a new client secret" and copy it
+Copy `.env.example` to `.env.local` and fill in:
 
-## Step 3: Configure Supabase Auth
+```env
+# Supabase Configuration (Required)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-1. In Supabase, go to Authentication > Providers
-2. Enable GitHub
-3. Paste your GitHub Client ID and Client Secret
-4. Save
+# Site Configuration (Required)
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
 
-## Step 4: Get Supabase Credentials
+# Upstash Redis (Required for Production Rate Limiting)
+UPSTASH_REDIS_REST_URL=https://your-redis-url.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-redis-token
+```
 
-1. In Supabase, go to Project Settings > API
-2. Copy:
-   - Project URL (NEXT_PUBLIC_SUPABASE_URL)
-   - Project API keys > anon public (NEXT_PUBLIC_SUPABASE_ANON_KEY)
+### 2. Database Security Setup
 
-## Step 5: Deploy to Vercel
+1. **Create Supabase Project**
+   - Go to https://supabase.com and create a new project
+   - Choose a strong database password
+   - Note: Store this password securely
 
-1. Push your code to GitHub
-2. Go to https://vercel.com
-3. Click "Add New Project"
-4. Import your GitHub repository
-5. Configure environment variables:
-   - NEXT_PUBLIC_SUPABASE_URL
-   - NEXT_PUBLIC_SUPABASE_ANON_KEY
-   - NEXT_PUBLIC_SITE_URL (your Vercel deployment URL)
-6. Click "Deploy"
+2. **Run SQL Setup Scripts** (in order):
+   ```sql
+   -- 1. Schema (tables and indexes)
+   -- Run: supabase/00_schema.sql
 
-## Step 6: Update GitHub OAuth Callback
+   -- 2. Row Level Security policies
+   -- Run: supabase/01_rls.sql
 
-After deployment:
+   -- 3. Database functions
+   -- Run: supabase/02_functions.sql
 
-1. Go back to your GitHub OAuth App settings
-2. Update the Authorization callback URL to your production URL:
-   `https://yourdomain.vercel.app/auth/callback`
-3. Save
+   -- 4. Triggers
+   -- Run: supabase/03_triggers.sql
 
-## Step 7: Update Supabase Site URL
+   -- 5. Service role permissions
+   -- Run: supabase/04_service_role_permissions.sql
+   ```
 
-1. In Supabase, go to Authentication > URL Configuration
-2. Set Site URL to your production URL
-3. Add your production URL to Redirect URLs
-4. Save
+3. **Verify RLS is Enabled**:
+   ```sql
+   SELECT tablename, rowsecurity 
+   FROM pg_tables 
+   WHERE schemaname = 'public';
+   -- All tables should show 'true' for rowsecurity
+   ```
 
-## Verification
+### 3. GitHub OAuth Configuration
 
-Visit your deployed URL and test:
-1. Sign in with GitHub
-2. Create a post
-3. Vote on posts
-4. Add comments
-5. View profiles
+1. **Create OAuth App**:
+   - Go to GitHub > Settings > Developer Settings > OAuth Apps
+   - Click "New OAuth App"
+   - Fill in:
+     - **Application name**: Stackd
+     - **Homepage URL**: https://your-domain.com
+     - **Authorization callback URL**: https://your-domain.com/auth/callback
+   - Click "Register application"
+
+2. **Get Credentials**:
+   - Copy **Client ID**
+   - Click "Generate a new client secret"
+   - Copy the **Client Secret** (shown only once!)
+
+3. **Configure in Supabase**:
+   - Go to Supabase > Authentication > Providers > GitHub
+   - Enable GitHub
+   - Paste Client ID and Client Secret
+   - Save
+
+### 4. Upstash Redis Setup (Required for Production)
+
+1. **Create Redis Database**:
+   - Go to https://upstash.com and sign up
+   - Click "Create Database"
+   - Choose region closest to your users
+   - Select "Global" for multi-region support (recommended)
+
+2. **Get REST API Credentials**:
+   - Go to your database details
+   - Click "REST API" tab
+   - Copy:
+     - **UPSTASH_REDIS_REST_URL**
+     - **UPSTASH_REDIS_REST_TOKEN**
+
+3. **Test Connection**:
+   ```bash
+   curl $UPSTASH_REDIS_REST_URL/ping \
+     -H "Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN"
+   # Should return: "PONG"
+   ```
+
+### 5. Key Rotation (CRITICAL)
+
+**Rotate Supabase Keys Before Production:**
+
+1. Go to Supabase > Project Settings > API
+2. Click "Generate new API keys"
+3. Update environment variables with new keys
+4. **Never commit old keys to git**
+
+### 6. Vercel Deployment
+
+1. **Push to GitHub**:
+   ```bash
+   git add .
+   git commit -m "Security hardening for production"
+   git push origin main
+   ```
+
+2. **Create Vercel Project**:
+   - Go to https://vercel.com
+   - Click "Add New Project"
+   - Import your GitHub repository
+   - Framework Preset: Next.js
+
+3. **Configure Environment Variables**:
+   Add these to Vercel (Production, Preview, and Development):
+   ```
+   NEXT_PUBLIC_SUPABASE_URL
+   NEXT_PUBLIC_SUPABASE_ANON_KEY
+   SUPABASE_SERVICE_ROLE_KEY
+   NEXT_PUBLIC_SITE_URL
+   UPSTASH_REDIS_REST_URL
+   UPSTASH_REDIS_REST_TOKEN
+   ```
+
+4. **Deploy**:
+   - Click "Deploy"
+   - Wait for build to complete
+
+### 7. Post-Deployment Configuration
+
+1. **Update GitHub OAuth Callback**:
+   - Go to GitHub OAuth App settings
+   - Update Authorization callback URL to your production URL
+   - Save
+
+2. **Update Supabase Site URL**:
+   - Go to Supabase > Authentication > URL Configuration
+   - Set Site URL to: https://your-domain.com
+   - Add to Redirect URLs: https://your-domain.com/auth/callback
+   - Save
+
+3. **Configure Custom Domain (Optional)**:
+   - In Vercel: Project > Settings > Domains
+   - Add your custom domain
+   - Update DNS records as instructed
+
+## Security Verification
+
+After deployment, verify all security measures are working:
+
+### 1. Check Security Headers
+
+Visit https://securityheaders.com and scan your domain:
+- **Expected Grade**: A or A+
+- **Required Headers**:
+  - Content-Security-Policy
+  - Strict-Transport-Security
+  - X-Frame-Options: DENY
+  - X-Content-Type-Options: nosniff
+  - Referrer-Policy
+
+### 2. Test Rate Limiting
+
+```bash
+# Test that rate limiting works (should block after limit)
+for i in {1..10}; do
+  curl -X POST https://your-domain.com/api/vote \
+    -H "Content-Type: application/json" \
+    -d '{"postId":"test","type":"up"}'
+done
+```
+
+### 3. Verify CSP Nonce
+
+Check that CSP header includes a nonce:
+```bash
+curl -I https://your-domain.com | grep -i content-security-policy
+# Should see: script-src 'self' 'nonce-xxx' 'strict-dynamic'
+```
+
+### 4. Test Authentication Flow
+
+- Sign in with GitHub
+- Verify cookies are httpOnly and Secure
+- Check that session persists correctly
+
+### 5. Verify Error Sanitization
+
+Trigger an error (e.g., try to create post without auth):
+- Error message should be generic: "Failed to create post. Please try again."
+- Should NOT contain SQL details or internal error messages
 
 ## Troubleshooting
 
-**OAuth callback fails:**
-- Check that callback URLs match exactly in GitHub OAuth settings and Supabase
-- Ensure NEXT_PUBLIC_SITE_URL is set correctly
+### Rate Limiting Not Working
 
-**Database errors:**
-- Verify RLS policies are applied
-- Check that tables were created correctly
+**Symptom**: Rate limits reset on every deployment
 
-**Vote not working:**
-- Ensure user is authenticated
-- Check browser console for errors
+**Solution**:
+- Verify `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are set
+- Check Vercel logs for Redis connection errors
+- Ensure Redis database is in "Active" state in Upstash
+
+### CSP Violations
+
+**Symptom**: Console shows CSP errors
+
+**Solution**:
+- Check that nonce is being generated in middleware.ts
+- Verify script tags include nonce attribute
+- For Shiki: Ensure CSS classes are being applied (check globals.css)
+
+### OAuth Callback Fails
+
+**Symptom**: "Authentication failed" after GitHub sign-in
+
+**Solution**:
+- Check that callback URL in GitHub OAuth settings matches exactly
+- Verify `NEXT_PUBLIC_SITE_URL` includes https://
+- Ensure Supabase > Auth > URL Configuration has correct site URL
+
+### Database Connection Errors
+
+**Symptom**: "Failed to fetch" or timeout errors
+
+**Solution**:
+- Verify Supabase project is not paused
+- Check that RLS policies were applied correctly
+- Ensure you're using anon key (not service role) for client-side
+
+## Maintenance
+
+### Regular Security Tasks
+
+**Weekly**:
+- Review Vercel deployment logs for errors
+- Check Upstash Redis usage (free tier: 10,000 req/day)
+
+**Monthly**:
+- Review and rotate API keys if needed
+- Update dependencies: `npm update`
+- Check securityheaders.com for grade changes
+
+**Quarterly**:
+- Full security audit
+- Review access logs for suspicious activity
+- Test disaster recovery (database backup restore)
+
+### Monitoring
+
+Set up monitoring for:
+- Failed authentication attempts
+- Rate limit triggers
+- Database connection errors
+- CSP violations (via report-uri)
+
+## Support
+
+If you encounter issues:
+
+1. Check logs in Vercel Dashboard
+2. Review [SECURITY.md](./SECURITY.md) for vulnerability reporting
+3. Open an issue on GitHub (do not include sensitive data)
+
+---
+
+**Last Updated**: 2026-02-16  
+**Stackd Version**: 1.0.0

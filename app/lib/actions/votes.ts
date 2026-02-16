@@ -5,6 +5,7 @@ import { createClient } from '../supabase/server'
 import { revalidatePath } from 'next/cache'
 import { validateId } from '../utils/validation'
 import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '../utils/rateLimit'
+import { sanitizeErrorMessage } from '../utils/security'
 
 // Cached data fetching
 export const getUserVote = cache(async (postId: string): Promise<'up' | 'down' | null> => {
@@ -58,7 +59,7 @@ export async function vote(postId: string, type: 'up' | 'down' | null): Promise<
       
       if (authError) {
         console.error('Auth error in vote:', authError.message, authError)
-        throw new Error(`Authentication failed: ${authError.message}`)
+        throw new Error('Authentication failed. Please sign in again.')
       }
       
       user = authUser
@@ -73,7 +74,7 @@ export async function vote(postId: string, type: 'up' | 'down' | null): Promise<
 
     // Check rate limit - per post to prevent vote spamming
     const rateLimitKey = getRateLimitKey(user.id, 'vote', postId)
-    const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.vote)
+    const rateLimitResult = await checkRateLimit(rateLimitKey, RATE_LIMITS.vote)
 
     if (rateLimitResult.limited) {
       throw new Error(`Please wait a moment before voting again.`)

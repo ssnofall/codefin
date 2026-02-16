@@ -54,7 +54,7 @@ export async function createComment(postId: string, body: string): Promise<void>
   
   // Check rate limit
   const rateLimitKey = getRateLimitKey(user.id, 'createComment')
-  const rateLimitResult = checkRateLimit(rateLimitKey, RATE_LIMITS.createComment)
+  const rateLimitResult = await checkRateLimit(rateLimitKey, RATE_LIMITS.createComment)
   
   if (rateLimitResult.limited) {
     throw new Error(`Rate limit exceeded. Please try again later.`)
@@ -97,7 +97,7 @@ export async function deleteComment(commentId: string, postId: string): Promise<
   
   // Check rate limit
   const rateLimitKey = getRateLimitKey(user.id, 'deleteComment')
-  const rateLimitResult = checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
+  const rateLimitResult = await checkRateLimit(rateLimitKey, { windowMs: 60 * 1000, maxRequests: 10 })
   
   if (rateLimitResult.limited) {
     throw new Error(`Rate limit exceeded. Please try again later.`)

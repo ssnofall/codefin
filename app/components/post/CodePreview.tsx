@@ -29,13 +29,38 @@ export function CodePreview({ code, language, fileName }: CodePreviewProps) {
         const html = await codeToHtml(code, {
           lang: language.toLowerCase() === 'other' ? 'text' : language.toLowerCase(),
           theme: 'github-dark',
+          // Use CSS variables instead of inline styles for CSP compliance
+          transformers: [{
+            pre(node) {
+              // Add CSS classes instead of inline styles
+              node.properties.class = 'shiki-pre';
+              // Remove inline styles that violate CSP
+              delete node.properties.style;
+            },
+            code(node) {
+              node.properties.class = 'shiki-code';
+              delete node.properties.style;
+            },
+            span(node) {
+              // Keep the color class but remove inline style
+              const style = node.properties.style;
+              if (typeof style === 'string') {
+                const color = style.match(/color:([^;]+)/)?.[1];
+                if (color) {
+                  // Map common colors to CSS classes
+                  node.properties.class = `shiki-token ${getColorClass(color)}`;
+                }
+              }
+              delete node.properties.style;
+            },
+          }],
         });
 
         if (isMounted) {
           // Sanitize Shiki HTML output to prevent XSS
           const sanitizedHtml = DOMPurify.sanitize(html, {
             ALLOWED_TAGS: ['pre', 'code', 'span', 'div'],
-            ALLOWED_ATTR: ['class', 'style', 'data-lang'],
+            ALLOWED_ATTR: ['class'],
           });
           setHighlighted(sanitizedHtml);
           setIsLoading(false);
@@ -92,4 +117,31 @@ export function CodePreview({ code, language, fileName }: CodePreviewProps) {
       </div>
     </div>
   );
+}
+
+/**
+ * Maps color values to CSS classes for CSP compliance
+ * This avoids inline styles which violate strict CSP
+ */
+function getColorClass(color: string): string {
+  // Normalize color
+  const normalized = color.toLowerCase().replace(/\s/g, '');
+  
+  // Map colors to semantic classes
+  const colorMap: Record<string, string> = {
+    '#ff7b72': 'shiki-red',
+    '#79c0ff': 'shiki-blue',
+    '#e3b341': 'shiki-yellow',
+    '#7ee787': 'shiki-green',
+    '#d2a8ff': 'shiki-purple',
+    '#ffa198': 'shiki-pink',
+    '#ff9bce': 'shiki-magenta',
+    '#56d364': 'shiki-lime',
+    '#ffdcd7': 'shiki-light-red',
+    '#c9d1d9': 'shiki-white',
+    '#8b949e': 'shiki-gray',
+    '#f0883e': 'shiki-orange',
+  };
+  
+  return colorMap[normalized] || 'shiki-default';
 }

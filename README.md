@@ -326,17 +326,38 @@ npm run build
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Secret key for admin operations | Supabase Dashboard > Settings > API |
 | `NEXT_PUBLIC_SITE_URL` | Yes | Your site's URL | `http://localhost:3000` for dev, Vercel URL for prod |
 
-## Security Considerations
+## Security Features
 
-- ✅ RLS policies protect user data
-- ✅ RLS policies optimized with (select auth.uid()) for better performance
-- ✅ Functions use secure search_path to prevent privilege escalation
-- ✅ Service role key never exposed to client
-- ✅ Rate limiting prevents spam
-- ✅ XSS protection via DOMPurify
-- ✅ Input validation on all forms
-- ✅ TypeScript for type safety
-- ✅ Leaked password protection enabled (recommended)
+Stackd implements comprehensive security measures for production deployment:
+
+### Authentication & Authorization
+- ✅ **Row Level Security (RLS)** - All tables protected with granular policies
+- ✅ **GitHub OAuth** - Secure authentication via Supabase Auth
+- ✅ **Session Management** - Secure httpOnly cookies with automatic refresh
+- ✅ **Profile Auto-Creation** - Secure user onboarding with defaults
+
+### Content Security
+- ✅ **Strict CSP with Nonces** - Dynamic nonce generation for inline scripts
+- ✅ **XSS Protection** - DOMPurify sanitizes all user-generated content
+- ✅ **CSS-Based Syntax Highlighting** - Shiki uses CSS classes instead of inline styles
+- ✅ **Input Validation** - All forms validated (UUIDs, tags, lengths, types)
+- ✅ **Error Sanitization** - No internal error details leaked to clients
+
+### Infrastructure Security
+- ✅ **Distributed Rate Limiting** - Upstash Redis for production (shared across Vercel instances)
+- ✅ **Security Headers** - HSTS, X-Frame-Options, CSP, and more
+- ✅ **DDoS Protection** - Rate limiting prevents abuse
+- ✅ **HTTPS Only** - All connections encrypted with TLS 1.3
+
+### Code Security
+- ✅ **TypeScript** - Type safety throughout the codebase
+- ✅ **Secret Management** - Environment variables only, never in code
+- ✅ **SQL Injection Prevention** - Parameterized queries via Supabase
+- ✅ **CSRF Protection** - SameSite cookies and request validation
+
+### Monitoring
+- ✅ **Security.txt** - Standard security contact information
+- ✅ **SECURITY.md** - Vulnerability reporting process
 
 ## Performance Features
 
@@ -345,37 +366,55 @@ npm run build
 - Optimized database indexes
 - Lazy loading of components
 - Image optimization with Next.js
-- Rate limiting to prevent abuse
+- Distributed rate limiting with Redis
 
-## Production Security Considerations
+## Production Security Checklist
 
-Before deploying to production, address the following security items:
+Before deploying to production:
 
-### Content Security Policy (CSP)
+### Required Environment Variables
 
-**Issue:** The current CSP in `next.config.ts` allows `'unsafe-inline'` and `'unsafe-eval'` scripts, which increases XSS attack surface.
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-**Current Configuration:**
-```javascript
-script-src 'self' 'unsafe-eval' 'unsafe-inline'
+# Site Configuration
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+
+# Upstash Redis (Required for Production)
+UPSTASH_REDIS_REST_URL=https://your-redis-url.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-redis-token
 ```
 
-**Recommended Fix:**
-- Remove `'unsafe-inline'` and `'unsafe-eval'` from production CSP
-- Use nonce-based CSP for any required inline scripts
-- If `'unsafe-eval'` is needed for specific libraries (e.g., Shiki syntax highlighting), consider more granular restrictions
+### Deployment Steps
 
-**Alternative:** Keep current CSP for development, use stricter policy for production builds only.
+1. **Rotate Supabase Keys**
+   - Go to Supabase Dashboard > Settings > API
+   - Generate new API keys
+   - Update Vercel environment variables
 
-### Rate Limiting Infrastructure
+2. **Configure Upstash Redis**
+   - Sign up at [upstash.com](https://upstash.com/)
+   - Create a Redis database
+   - Copy REST URL and token to Vercel
 
-**Issue:** The current rate limiting uses in-memory storage (`Map`), which:
-- Resets on every server restart/deployment
-- Does not work across multiple server instances (Vercel's serverless functions)
-- Can lead to memory leaks under sustained high load
+3. **Update GitHub OAuth**
+   - Go to GitHub > Settings > Developer Settings > OAuth Apps
+   - Update Authorization callback URL to production domain
+   - Save changes
 
-**Recommended Fix:**
-- Use Redis or a distributed cache for production (e.g., Upstash Redis)
+4. **Verify Security Headers**
+   - Test with [securityheaders.com](https://securityheaders.com)
+   - Ensure A+ rating
+
+5. **Test All Functionality**
+   - Authentication flow
+   - Post creation/editing/deletion
+   - Voting system
+   - Comments
+   - Theme switching
 - Update `app/lib/utils/rateLimit.ts` to use Redis instead of in-memory Map
 - Ensure rate limits are shared across all server instances
 
