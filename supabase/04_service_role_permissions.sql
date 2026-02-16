@@ -16,9 +16,6 @@ grant select, insert, update, delete on table profiles to service_role;
 grant select, insert, update, delete on table votes to service_role;
 grant select, insert, update, delete on table comments to service_role;
 
--- Grant permissions on materialized views if they exist
-grant select on table trending_tags to service_role;
-
 -- Verify grants (for debugging, can be removed in production)
 do $$
 begin

@@ -76,7 +76,8 @@ stackd/
 │   ├── 00_schema.sql          # Database schema (tables, indexes)
 │   ├── 01_rls.sql             # Row Level Security policies
 │   ├── 02_functions.sql       # Database functions
-│   └── 03_triggers.sql        # Triggers and materialized views
+│   ├── 03_triggers.sql        # Triggers and materialized views
+│   └── 04_service_role_permissions.sql  # Service role grants
 ├── middleware.ts              # Auth middleware
 ├── next.config.ts             # Next.js configuration
 └── package.json
@@ -153,15 +154,9 @@ Run this query in SQL Editor to verify:
 ```sql
 -- Check if tables exist
 SELECT tablename FROM pg_tables WHERE schemaname = 'public';
-
--- Check if materialized view exists and has data
-SELECT * FROM trending_tags LIMIT 5;
-
--- If trending_tags is empty, refresh it:
-REFRESH MATERIALIZED VIEW CONCURRENTLY trending_tags;
 ```
 
-### 6. Set Up GitHub OAuth
+### 5. Set Up GitHub OAuth
 
 1. Go to GitHub > Settings > Developer Settings > OAuth Apps > New OAuth App
 2. Fill in:
@@ -176,7 +171,7 @@ REFRESH MATERIALIZED VIEW CONCURRENTLY trending_tags;
 8. Paste in your Client ID and Client Secret
 9. Save
 
-### 7. Enable Password Security (Recommended)
+### 6. Enable Password Security (Recommended)
 
 Enable leaked password protection to prevent users from using compromised passwords:
 
@@ -189,7 +184,7 @@ Alternatively, use the Supabase CLI:
 supabase auth password-leaked-protection enable
 ```
 
-### 8. Run Development Server
+### 7. Run Development Server
 
 ```bash
 npm run dev
@@ -197,13 +192,12 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-### 9. Verify Everything Works
+### 8. Verify Everything Works
 
 1. Click "Sign In" and authenticate with GitHub
 2. Create a test post with tags
-3. Check the trending topics widget shows real counts (not "1 Post")
-4. Vote on a post
-5. Add a comment
+3. Vote on a post
+4. Add a comment
 
 ## Deployment to Vercel
 
@@ -269,18 +263,6 @@ NEXT_PUBLIC_SITE_URL=https://your-project.vercel.app
 
 ## Database Maintenance
 
-### Refresh Trending Tags Manually
-
-If you need to refresh the trending tags view manually:
-
-```sql
--- In Supabase SQL Editor
-REFRESH MATERIALIZED VIEW trending_tags;
-
--- Or use the function:
-SELECT refresh_trending_tags();
-```
-
 ### Check Database Status
 
 ```sql
@@ -290,9 +272,6 @@ SELECT
   (SELECT COUNT(*) FROM profiles) as user_count,
   (SELECT COUNT(*) FROM comments) as comment_count,
   (SELECT COUNT(*) FROM votes) as vote_count;
-
--- Check trending tags
-SELECT * FROM trending_tags ORDER BY count DESC LIMIT 10;
 ```
 
 ## Troubleshooting
@@ -308,25 +287,6 @@ rm -rf node_modules package-lock.json
 npm install
 npm run build
 ```
-
-### Trending Topics Shows "1 Post" for All Tags
-
-**Problem**: All trending tags show "1 Post" instead of real counts
-
-**Solution**:
-1. Check if materialized view exists:
-   ```sql
-   SELECT * FROM pg_matviews WHERE matviewname = 'trending_tags';
-   ```
-2. If not found, run `supabase/03_triggers.sql`
-3. Refresh the view:
-   ```sql
-   REFRESH MATERIALIZED VIEW CONCURRENTLY trending_tags;
-   ```
-4. Verify trigger exists:
-   ```sql
-   SELECT * FROM pg_trigger WHERE tgname = 'refresh_trending_tags_on_change';
-   ```
 
 ### Authentication Not Working
 
@@ -380,7 +340,7 @@ npm run build
 
 ## Performance Features
 
-- Materialized views for fast aggregations
+- Client-side aggregation for trending tags
 - Cached server actions with React cache
 - Optimized database indexes
 - Lazy loading of components
@@ -407,7 +367,8 @@ If you encounter issues:
    - `00_schema.sql` - Tables and indexes
    - `01_rls.sql` - RLS policies
    - `02_functions.sql` - Database functions
-   - `03_triggers.sql` - Triggers and materialized views
+   - `03_triggers.sql` - Triggers
+   - `04_service_role_permissions.sql` - Service role permissions
 3. Check browser console and server logs
 4. Open an issue on GitHub
 

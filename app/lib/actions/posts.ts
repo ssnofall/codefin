@@ -250,31 +250,15 @@ export async function createPost(formData: FormData): Promise<void> {
   }
 }
 
-// Optimized trending tags using materialized view with auto-refresh trigger
-// The materialized view 'trending_tags' is created in supabase/optimization.sql
-// It pre-aggregates tag counts from posts in the last 30 days for fast queries
-// Auto-refresh trigger ensures data stays current when posts are created/updated/deleted
-// Falls back to JavaScript aggregation if view doesn't exist
+// Trending tags using client-side aggregation
+// Aggregates tag counts from posts in the last 30 days
+// This approach doesn't require a database materialized view
 export const getTrendingTags = cache(async () => {
   try {
     // Use static client since this doesn't require authentication
     const supabase = createStaticClient()
     
-    // Try to use materialized view first (much faster - O(1) vs O(n) scanning)
-    try {
-      const { data: viewData, error: viewError } = await supabase
-        .from('trending_tags')
-        .select('tag, count')
-        .limit(10)
-      
-      if (!viewError && viewData) {
-        return viewData as TrendingTag[]
-      }
-    } catch {
-      // Materialized view doesn't exist, fall back to regular query
-    }
-    
-    // Fallback: Only fetch posts from last 30 days for trending
+    // Fetch posts from last 30 days for trending
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
     

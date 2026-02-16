@@ -34,19 +34,4 @@ begin
 end;
 $$ language plpgsql security definer set search_path = pg_catalog;
 
--- Refresh trending tags materialized view
-create or replace function public.refresh_trending_tags()
-returns void as $$
-begin
-  refresh materialized view concurrently trending_tags;
-end;
-$$ language plpgsql set search_path = pg_catalog;
 
--- Auto-refresh trending tags on post change
-create or replace function public.refresh_trending_tags_trigger()
-returns trigger as $$
-begin
-  refresh materialized view concurrently trending_tags;
-  return null;
-end;
-$$ language plpgsql set search_path = pg_catalog;
