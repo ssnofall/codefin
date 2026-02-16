@@ -76,7 +76,7 @@ stackd/
 │   ├── 00_schema.sql          # Database schema (tables, indexes)
 │   ├── 01_rls.sql             # Row Level Security policies
 │   ├── 02_functions.sql       # Database functions
-│   ├── 03_triggers.sql        # Triggers and materialized views
+│   ├── 03_triggers.sql        # Triggers
 │   └── 04_service_role_permissions.sql  # Service role grants
 ├── middleware.ts              # Auth middleware
 ├── next.config.ts             # Next.js configuration
@@ -142,7 +142,7 @@ Run the SQL files in order in the Supabase SQL Editor:
 2. Copy the contents and paste into SQL Editor
 3. Click "Run"
 
-**Step 4: Create Triggers & Materialized Views**
+**Step 4: Create Triggers**
 
 1. Open `supabase/03_triggers.sql`
 2. Copy the contents and paste into SQL Editor
@@ -156,7 +156,7 @@ Run this query in SQL Editor to verify:
 SELECT tablename FROM pg_tables WHERE schemaname = 'public';
 ```
 
-### 5. Set Up GitHub OAuth
+### 6. Set Up GitHub OAuth
 
 1. Go to GitHub > Settings > Developer Settings > OAuth Apps > New OAuth App
 2. Fill in:
@@ -171,7 +171,7 @@ SELECT tablename FROM pg_tables WHERE schemaname = 'public';
 8. Paste in your Client ID and Client Secret
 9. Save
 
-### 6. Enable Password Security (Recommended)
+### 7. Enable Password Security (Recommended)
 
 Enable leaked password protection to prevent users from using compromised passwords:
 
@@ -184,7 +184,7 @@ Alternatively, use the Supabase CLI:
 supabase auth password-leaked-protection enable
 ```
 
-### 7. Run Development Server
+### 8. Run Development Server
 
 ```bash
 npm run dev
@@ -192,7 +192,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-### 8. Verify Everything Works
+### 9. Verify Everything Works
 
 1. Click "Sign In" and authenticate with GitHub
 2. Create a test post with tags
@@ -346,6 +346,57 @@ npm run build
 - Lazy loading of components
 - Image optimization with Next.js
 - Rate limiting to prevent abuse
+
+## Production Security Considerations
+
+Before deploying to production, address the following security items:
+
+### Content Security Policy (CSP)
+
+**Issue:** The current CSP in `next.config.ts` allows `'unsafe-inline'` and `'unsafe-eval'` scripts, which increases XSS attack surface.
+
+**Current Configuration:**
+```javascript
+script-src 'self' 'unsafe-eval' 'unsafe-inline'
+```
+
+**Recommended Fix:**
+- Remove `'unsafe-inline'` and `'unsafe-eval'` from production CSP
+- Use nonce-based CSP for any required inline scripts
+- If `'unsafe-eval'` is needed for specific libraries (e.g., Shiki syntax highlighting), consider more granular restrictions
+
+**Alternative:** Keep current CSP for development, use stricter policy for production builds only.
+
+### Rate Limiting Infrastructure
+
+**Issue:** The current rate limiting uses in-memory storage (`Map`), which:
+- Resets on every server restart/deployment
+- Does not work across multiple server instances (Vercel's serverless functions)
+- Can lead to memory leaks under sustained high load
+
+**Recommended Fix:**
+- Use Redis or a distributed cache for production (e.g., Upstash Redis)
+- Update `app/lib/utils/rateLimit.ts` to use Redis instead of in-memory Map
+- Ensure rate limits are shared across all server instances
+
+**Implementation:**
+```typescript
+// Use Upstash Redis for distributed rate limiting
+import { Redis } from '@upstash/redis'
+const redis = new Redis({ url: process.env.UPSTASH_REDIS_URL, token: process.env.UPSTASH_REDIS_TOKEN })
+```
+
+### Security Best Practices Implemented
+
+The following security measures are already in place:
+
+- ✅ **Row Level Security (RLS):** All tables have proper RLS policies restricting data access
+- ✅ **XSS Protection:** DOMPurify sanitizes user-generated content before rendering
+- ✅ **Input Validation:** All user inputs validated (UUIDs, tags, languages, lengths)
+- ✅ **Authentication:** Proper session management with Supabase Auth
+- ✅ **Authorization:** Server actions verify ownership before updates/deletions
+- ✅ **Security Headers:** X-Frame-Options, X-Content-Type-Options, Referrer-Policy configured
+- ✅ **Secrets Management:** Service role key isolated in environment variables (never committed)
 
 ## Contributing
 

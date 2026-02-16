@@ -10,7 +10,7 @@ begin
   );
   return new;
 end;
-$$ language plpgsql security definer set search_path = pg_catalog;
+$$ language plpgsql security definer set search_path = public, pg_catalog;
 
 -- Update post and author score on vote change
 create or replace function public.update_post_score()
@@ -32,6 +32,6 @@ begin
   
   return coalesce(new, old);
 end;
-$$ language plpgsql security definer set search_path = pg_catalog;
+$$ language plpgsql security definer set search_path = public, pg_catalog;
 
 
