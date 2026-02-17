@@ -42,7 +42,7 @@ export default function CreatePostPage() {
 
     try {
       await createPost(formData);
-      router.replace('/feed');
+      router.push('/feed');
       router.refresh();
     } catch (error) {
       alert('Failed to create post. Please try again.');
@@ -122,7 +122,6 @@ export default function CreatePostPage() {
               Code <span className="text-destructive">*</span>
             </label>
             <CodeEditor
-              id="code"
               code={code}
               onChange={setCode}
               language={language || 'text'}
@@ -158,7 +157,6 @@ export default function CreatePostPage() {
             <input
               type="text"
               id="tags"
-              name="tags"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={handleAddTag}

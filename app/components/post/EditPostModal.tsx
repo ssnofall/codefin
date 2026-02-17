@@ -160,13 +160,11 @@ export function EditPostModal({ post, isOpen, onClose }: EditPostModalProps) {
               Code <span className="text-destructive">*</span>
             </label>
             <CodeEditor
-              id="edit-code"
               code={code}
               onChange={setCode}
               language={language || 'text'}
               fileName={fileName}
               placeholder="Paste your code here..."
-              name="code"
             />
           </div>
 
@@ -195,7 +193,6 @@ export function EditPostModal({ post, isOpen, onClose }: EditPostModalProps) {
             <input
               type="text"
               id="edit-tags"
-              name="tags"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={handleAddTag}

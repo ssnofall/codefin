@@ -247,8 +247,6 @@ export function SettingsClient({ user, profile }: SettingsClientProps) {
 
               <input
                 type="text"
-                id="delete-confirm"
-                name="deleteConfirm"
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
                 placeholder="Type DELETE"
