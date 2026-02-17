@@ -6,6 +6,7 @@ import { Code2, Settings, LogOut } from 'lucide-react';
 import { APP_NAME } from '../../lib/utils/constants';
 import { logout } from '../../lib/actions/auth';
 import { Button } from '@/components/ui/button';
+import { SignInButton } from '../ui/SignInButton';
 
 interface HeaderProps {
   user: User | null;
@@ -53,11 +54,7 @@ export function Header({ user }: HeaderProps) {
               </Link>
             </>
           ) : (
-            <Link href="/auth/login">
-              <Button className="rounded-xl">
-                Sign In
-              </Button>
-            </Link>
+            <SignInButton />
           )}
         </div>
 

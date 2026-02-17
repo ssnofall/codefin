@@ -554,3 +554,20 @@ html {
     border-radius: 40% 50% 60% 50% / 60% 40% 50% 40%;
   }
 }
+
+/* Liquid border animation for buttons */
+@keyframes liquid-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-liquid-border {
+  animation: liquid-border 3s ease infinite;
+}
