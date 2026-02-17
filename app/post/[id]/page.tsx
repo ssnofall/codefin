@@ -39,6 +39,9 @@ export async function generateStaticParams() {
 // Revalidate every 60 seconds for ISR
 export const revalidate = 60;
 
+// Force dynamic rendering to allow cookie access
+export const dynamic = 'force-dynamic';
+
 export default async function PostPage({ params }: PostPageProps) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
