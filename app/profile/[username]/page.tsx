@@ -28,6 +28,9 @@ export async function generateStaticParams() {
 // Revalidate every 60 seconds for ISR
 export const revalidate = 60;
 
+// Force dynamic rendering to allow cookie access
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: ProfilePageProps) {
   const { username } = await params;
   return {
