@@ -185,6 +185,13 @@ CREATE OR REPLACE TRIGGER "on_vote_change" AFTER INSERT OR DELETE OR UPDATE ON "
 
 
 
+-- Auto-create profile on user signup
+CREATE OR REPLACE TRIGGER "on_auth_user_created"
+    AFTER INSERT ON "auth"."users"
+    FOR EACH ROW EXECUTE FUNCTION "public"."handle_new_user"();
+
+
+
 ALTER TABLE ONLY "public"."comments"
     ADD CONSTRAINT "comments_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON DELETE CASCADE;
 
