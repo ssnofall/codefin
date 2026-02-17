@@ -14,7 +14,7 @@ interface HeaderProps {
 
 export function Header({ user }: HeaderProps) {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md border-b border-white/5 dark:border-white/5">
       <div className="px-3 sm:px-4 h-16 flex items-center justify-between max-w-[1400px] mx-auto">
         {/* Logo */}
         <Link href="/feed" className="flex items-center gap-2 group">
