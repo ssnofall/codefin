@@ -571,3 +571,29 @@ html {
 .animate-liquid-border {
   animation: liquid-border 3s ease infinite;
 }
+
+/* Glassy liquid border animation */
+@keyframes liquid-border-glass {
+  0% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  25% {
+    filter: hue-rotate(5deg) brightness(1.1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(0deg) brightness(1.2);
+  }
+  75% {
+    filter: hue-rotate(-5deg) brightness(1.1);
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) brightness(1);
+  }
+}
+
+.animate-liquid-border-glass {
+  animation: liquid-border-glass 4s ease-in-out infinite;
+}
