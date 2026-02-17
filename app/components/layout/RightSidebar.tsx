@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getPlatformStats, getTrendingTags, getLanguageDistribution } from '../../lib/actions/posts';
 import { getProfileByUsername, getUserLanguages } from '../../lib/actions/profiles';
-import { Card } from '../ui/Card';
+import { GlassCard } from '../ui/GlassCard';
 import { LanguageProgressBar } from '../ui/LanguageProgressBar';
 
 interface Language {
@@ -89,7 +89,7 @@ export function RightSidebar() {
   if (isProfilePage) {
     return (
       <div className="flex flex-col h-full py-4 space-y-6">
-        <Card>
+      <GlassCard hover={false} className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <Code className="w-4 h-4 text-primary" />
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
@@ -109,7 +109,7 @@ export function RightSidebar() {
               <p className="text-sm text-muted-foreground">No posts yet</p>
             )}
           </div>
-        </Card>
+        </GlassCard>
       </div>
     );
   }
@@ -117,9 +117,9 @@ export function RightSidebar() {
   // Default view - show platform stats, trending topics, and platform languages
 
   return (
-    <div className="flex flex-col h-full py-4 space-y-6">
+    <div className="flex flex-col h-full py-6 space-y-6">
       {/* Platform Stats */}
-      <Card>
+      <GlassCard hover={false} className="p-6">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
           Platform Stats
         </h3>
@@ -139,10 +139,10 @@ export function RightSidebar() {
             <p className="text-2xl font-bold">{platformStats?.users.toLocaleString() ?? 0}</p>
           </div>
         </div>
-      </Card>
+      </GlassCard>
 
       {/* Trending Topics */}
-      <Card>
+      <GlassCard hover={false} className="p-6">
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
@@ -173,10 +173,10 @@ export function RightSidebar() {
             <p className="text-sm text-muted-foreground">No trending tags yet</p>
           )}
         </div>
-      </Card>
+      </GlassCard>
 
       {/* Language Distribution */}
-      <Card>
+      <GlassCard hover={false} className="p-6">
         <div className="flex items-center gap-2 mb-4">
           <BarChart3 className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
@@ -196,7 +196,7 @@ export function RightSidebar() {
             <p className="text-sm text-muted-foreground">No posts yet</p>
           )}
         </div>
-      </Card>
+      </GlassCard>
     </div>
   );
 }

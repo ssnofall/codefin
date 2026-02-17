@@ -95,11 +95,20 @@ export default async function RootLayout({
         className={`${inter.variable} font-sans antialiased bg-background text-foreground min-h-screen`}
       >
         <ThemeProvider>
-          <div className="fixed inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none" />
+          {/* Liquid flow background */}
+          <div className="liquid-bg">
+            <div className="liquid-blob liquid-blob-1" />
+            <div className="liquid-blob liquid-blob-2" />
+            <div className="liquid-blob liquid-blob-3" />
+          </div>
+          {/* Atmospheric radial gradient glow */}
+          <div className="fixed inset-0 bg-atmospheric pointer-events-none" />
+          {/* Subtle grid pattern overlay */}
+          <div className="fixed inset-0 bg-grid-pattern opacity-40 pointer-events-none" />
           <Suspense fallback={<HeaderSkeleton />}>
             <HeaderWithUser />
           </Suspense>
-          <div className="pt-16">
+          <div className="pt-20">
             <div className="max-w-[1320px] mx-auto px-3 sm:px-4">
               <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_300px] gap-4 lg:gap-6">
                 {/* Left Sidebar - Desktop Only */}
@@ -140,10 +149,10 @@ export default async function RootLayout({
 
 function HeaderSkeleton() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-sm">
-      <div className="max-w-[1320px] mx-auto px-4 h-16 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md border-b border-white/5 dark:border-white/5">
+      <div className="px-3 sm:px-4 h-16 flex items-center justify-between max-w-[1400px] mx-auto">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-muted animate-pulse" />
+          <div className="w-8 h-8 rounded-xl bg-muted animate-pulse" />
           <div className="h-6 w-20 bg-muted rounded animate-pulse" />
         </div>
         <div className="h-9 w-24 bg-muted rounded-lg animate-pulse" />
@@ -154,12 +163,12 @@ function HeaderSkeleton() {
 
 function LeftSidebarSkeleton() {
   return (
-    <div className="flex flex-col h-full py-4 space-y-6">
-      <nav className="space-y-1">
+    <div className="flex flex-col h-full py-6 space-y-6">
+      <nav className="space-y-1.5">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl">
-            <div className="w-5 h-5 bg-muted rounded animate-pulse" />
-            <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+          <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-2xl">
+            <div className="w-5 h-5 bg-white/10 rounded animate-pulse" />
+            <div className="h-4 w-16 bg-white/10 rounded animate-pulse" />
           </div>
         ))}
       </nav>
@@ -169,43 +178,43 @@ function LeftSidebarSkeleton() {
 
 function RightSidebarSkeleton() {
   return (
-    <div className="space-y-6 py-4">
-      <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="h-4 w-24 bg-muted rounded animate-pulse mb-4" />
+    <div className="space-y-6 py-6">
+      <div className="glass rounded-2xl border border-[var(--glass-border)] p-6">
+        <div className="h-4 w-24 bg-white/10 rounded animate-pulse mb-4" />
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <div className="h-3 w-12 bg-muted rounded animate-pulse" />
-            <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+            <div className="h-3 w-12 bg-white/10 rounded animate-pulse" />
+            <div className="h-8 w-16 bg-white/10 rounded animate-pulse" />
           </div>
           <div className="space-y-2">
-            <div className="h-3 w-12 bg-muted rounded animate-pulse" />
-            <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+            <div className="h-3 w-12 bg-white/10 rounded animate-pulse" />
+            <div className="h-8 w-16 bg-white/10 rounded animate-pulse" />
           </div>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="h-4 w-28 bg-muted rounded animate-pulse mb-4" />
+      <div className="glass rounded-2xl border border-[var(--glass-border)] p-6">
+        <div className="h-4 w-28 bg-white/10 rounded animate-pulse mb-4" />
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-3 w-4 bg-muted rounded animate-pulse" />
-                <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+                <div className="h-3 w-4 bg-white/10 rounded animate-pulse" />
+                <div className="h-4 w-20 bg-white/10 rounded animate-pulse" />
               </div>
-              <div className="h-3 w-12 bg-muted rounded animate-pulse" />
+              <div className="h-3 w-12 bg-white/10 rounded animate-pulse" />
             </div>
           ))}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="h-4 w-24 bg-muted rounded animate-pulse mb-4" />
+      <div className="glass rounded-2xl border border-[var(--glass-border)] p-6">
+        <div className="h-4 w-24 bg-white/10 rounded animate-pulse mb-4" />
         <div className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="space-y-2">
-              <div className="h-3 w-full bg-muted rounded animate-pulse" />
-              <div className="h-3 w-2/3 bg-muted rounded animate-pulse" />
+              <div className="h-3 w-full bg-white/10 rounded animate-pulse" />
+              <div className="h-3 w-2/3 bg-white/10 rounded animate-pulse" />
             </div>
           ))}
         </div>

@@ -60,7 +60,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     const userVotes = postIds.length > 0 ? await getUserVotesForPosts(postIds) : {};
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 mt-6">
         {/* Profile Header */}
         <ProfileHeader 
           profile={profile} 

@@ -5,6 +5,8 @@ import { User } from '@supabase/supabase-js';
 import { Code2, Settings, LogOut } from 'lucide-react';
 import { APP_NAME } from '../../lib/utils/constants';
 import { logout } from '../../lib/actions/auth';
+import { Button } from '@/components/ui/button';
+import { SignInButton } from '../ui/SignInButton';
 
 interface HeaderProps {
   user: User | null;
@@ -12,11 +14,11 @@ interface HeaderProps {
 
 export function Header({ user }: HeaderProps) {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-sm">
-      <div className="max-w-[1320px] mx-auto px-3 sm:px-4 h-16 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md border-b border-white/5 dark:border-white/5">
+      <div className="px-3 sm:px-4 h-16 flex items-center justify-between max-w-[1400px] mx-auto">
         {/* Logo */}
         <Link href="/feed" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
             <Code2 className="w-5 h-5 text-primary-foreground" />
           </div>
           <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
@@ -25,39 +27,34 @@ export function Header({ user }: HeaderProps) {
         </Link>
 
         {/* Desktop Navigation + Auth */}
-        <div className="hidden lg:flex items-center gap-4">
+        <div className="hidden lg:flex items-center gap-3">
           {user ? (
             <>
               <Link
                 href="/settings"
-                className="p-2 rounded-lg hover:bg-accent transition-colors"
+                className="p-2.5 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 transition-colors"
                 aria-label="Settings"
               >
-                <Settings className="w-5 h-5" />
+                <Settings className="w-5 h-5 text-muted-foreground" />
               </Link>
               <form action={logout}>
-                <button
+                <Button
                   type="submit"
-                  className="p-2 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-colors"
+                  variant="glass"
+                  size="icon"
                   aria-label="Sign Out"
                 >
                   <LogOut className="w-5 h-5" />
-                </button>
+                </Button>
               </form>
-              <Link
-                href="/create"
-                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity"
-              >
-                Create Post
+              <Link href="/create">
+                <Button className="rounded-xl">
+                  Create Post
+                </Button>
               </Link>
             </>
           ) : (
-            <Link
-              href="/auth/login"
-              className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity"
-            >
-              Sign In
-            </Link>
+            <SignInButton />
           )}
         </div>
 
@@ -66,10 +63,10 @@ export function Header({ user }: HeaderProps) {
           {user ? (
             <Link
               href="/settings"
-              className="p-2 rounded-lg hover:bg-accent transition-colors touch-target"
+              className="p-2.5 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 transition-colors touch-target"
               aria-label="Settings"
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-5 h-5 text-muted-foreground" />
             </Link>
           ) : null}
         </div>
