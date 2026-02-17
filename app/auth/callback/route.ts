@@ -1,6 +1,7 @@
 import { createClient } from '../../lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { validateRedirectPath } from '../../lib/utils/validation';
+import type { Database } from '../../lib/supabase/types';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -35,7 +36,7 @@ export async function GET(request: Request) {
             id: user.id,
             username: username,
             avatar_url: avatarUrl
-          });
+          } as Database['public']['Tables']['profiles']['Insert']);
         }
       }
       
