@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MessageSquare } from 'lucide-react';
 import { Tables } from '../../lib/supabase/types';
-import { Card } from '../ui/Card';
+import { GlassCard } from '../ui/GlassCard';
 import { Tag } from '../ui/Tag';
 import { VoteButtons } from '../post/VoteButtons';
 import { PostMenu } from '../post/PostMenu';
@@ -31,29 +31,29 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
   const isOwner = currentUserId === post.author_id;
 
   return (
-    <Card className="group p-3 sm:p-5">
+    <GlassCard className="group p-4 sm:p-6" hover={true}>
       {/* Desktop Layout */}
       <div className="hidden lg:block">
         {/* Content */}
         <div className="flex-1 min-w-0">
           {/* Header */}
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <Link href={`/profile/${post.profiles?.username}`} className="flex items-center gap-2 group/author">
                 <Image
                   src={post.profiles?.avatar_url || '/default-avatar.png'}
                   alt={post.profiles?.username || 'User'}
-                  width={24}
-                  height={24}
-                  className="rounded-full"
+                  width={28}
+                  height={28}
+                  className="rounded-full ring-2 ring-white/10"
                   loading="lazy"
                 />
                 <span className="text-sm font-medium group-hover/author:text-primary transition-colors">
                   {post.profiles?.username}
                 </span>
               </Link>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-muted-foreground/60">•</span>
+              <span className="text-sm text-muted-foreground/60">
                 {formatDate(post.created_at)}
               </span>
             </div>
@@ -62,7 +62,7 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
 
           {/* Title */}
           <Link href={`/post/${post.id}`}>
-            <h3 className="text-lg font-semibold mb-3 group-hover:text-primary transition-colors line-clamp-2">
+            <h3 className="text-xl sm:text-2xl font-semibold mb-4 group-hover:text-primary transition-colors line-clamp-2 leading-tight">
               {post.title}
             </h3>
           </Link>
@@ -124,23 +124,23 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
       {/* Mobile Layout: Stacked with horizontal votes */}
       <div className="lg:hidden">
         {/* Header */}
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2 min-w-0">
             <Link href={`/profile/${post.profiles?.username}`} className="flex items-center gap-2 group/author shrink-0">
               <Image
                 src={post.profiles?.avatar_url || '/default-avatar.png'}
                 alt={post.profiles?.username || 'User'}
-                width={24}
-                height={24}
-                className="rounded-full"
+                width={28}
+                height={28}
+                className="rounded-full ring-2 ring-white/10"
                 loading="lazy"
               />
               <span className="text-sm font-medium group-hover/author:text-primary transition-colors truncate">
                 {post.profiles?.username}
               </span>
             </Link>
-            <span className="text-muted-foreground shrink-0">•</span>
-            <span className="text-xs text-muted-foreground shrink-0">
+            <span className="text-muted-foreground/60 shrink-0">•</span>
+            <span className="text-xs text-muted-foreground/60 shrink-0">
               {formatDate(post.created_at)}
             </span>
           </div>
@@ -149,7 +149,7 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
 
         {/* Title */}
         <Link href={`/post/${post.id}`}>
-          <h3 className="text-base font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2">
+          <h3 className="text-lg font-semibold mb-3 group-hover:text-primary transition-colors line-clamp-2 leading-tight">
             {post.title}
           </h3>
         </Link>
@@ -205,6 +205,6 @@ export function PostCard({ post, userVote, currentUserId }: PostCardProps) {
           </Link>
         </div>
       </div>
-    </Card>
+    </GlassCard>
   );
 }

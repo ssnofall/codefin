@@ -19,9 +19,9 @@ export function LeftSidebar({ user }: LeftSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div className="flex flex-col h-full py-4 space-y-6">
+    <div className="flex flex-col h-full py-6 space-y-6">
       {/* Main Navigation */}
-      <nav className="space-y-1">
+      <nav className="space-y-1.5">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -30,13 +30,13 @@ export function LeftSidebar({ user }: LeftSidebarProps) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-primary/10 text-primary border border-primary/20'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  ? 'bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-white/5 dark:hover:bg-white/5'
               }`}
             >
-              <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-primary' : ''}`} />
+              <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-[var(--accent)]' : ''}`} />
               {item.label}
             </Link>
           );
@@ -46,28 +46,28 @@ export function LeftSidebar({ user }: LeftSidebarProps) {
       {/* User Section */}
       {user && (
         <>
-          <div className="border-t border-border/50 pt-4">
-            <nav className="space-y-1">
+          <div className="border-t border-[var(--glass-border)] pt-6">
+            <nav className="space-y-1.5">
               <Link
                 href={`/profile/${user.user_metadata?.user_name || 'me'}`}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 ${
                   pathname.startsWith('/profile')
-                    ? 'bg-primary/10 text-primary border border-primary/20'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    ? 'bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-white/5 dark:hover:bg-white/5'
                 }`}
               >
-                <UserIcon className={`w-5 h-5 transition-colors ${pathname.startsWith('/profile') ? 'text-primary' : ''}`} />
+                <UserIcon className={`w-5 h-5 transition-colors ${pathname.startsWith('/profile') ? 'text-[var(--accent)]' : ''}`} />
                 Profile
               </Link>
               <Link
                 href="/settings"
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 ${
                   pathname === '/settings'
-                    ? 'bg-primary/10 text-primary border border-primary/20'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    ? 'bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-white/5 dark:hover:bg-white/5'
                 }`}
               >
-                <Settings className={`w-5 h-5 transition-colors ${pathname === '/settings' ? 'text-primary' : ''}`} />
+                <Settings className={`w-5 h-5 transition-colors ${pathname === '/settings' ? 'text-[var(--accent)]' : ''}`} />
                 Settings
               </Link>
             </nav>

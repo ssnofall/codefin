@@ -95,7 +95,10 @@ export default async function RootLayout({
         className={`${inter.variable} font-sans antialiased bg-background text-foreground min-h-screen`}
       >
         <ThemeProvider>
-          <div className="fixed inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none" />
+          {/* Atmospheric radial gradient glow */}
+          <div className="fixed inset-0 bg-atmospheric pointer-events-none" />
+          {/* Subtle grid pattern overlay */}
+          <div className="fixed inset-0 bg-grid-pattern opacity-40 pointer-events-none" />
           <Suspense fallback={<HeaderSkeleton />}>
             <HeaderWithUser />
           </Suspense>
