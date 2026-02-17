@@ -57,8 +57,8 @@
 }
 
 :root {
-  /* Base radius - 24px for generous curves */
-  --radius: 1.5rem;
+  /* Base radius - original value */
+  --radius: 0.625rem;
   
   /* Forest Theme - Light Mode */
   --background: oklch(0.99 0.005 150);
@@ -490,4 +490,67 @@ html {
 ::selection {
   background: rgba(var(--accent-rgb), 0.3);
   color: inherit;
+}
+
+/* Liquid Flow Background */
+.liquid-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  overflow: hidden;
+}
+
+.liquid-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  animation: liquidMove 25s ease-in-out infinite;
+}
+
+.liquid-blob-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.6) 0%, transparent 70%);
+  top: -200px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.liquid-blob-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(var(--primary-rgb), 0.5) 0%, transparent 70%);
+  top: 20%;
+  right: -150px;
+  animation-delay: -8s;
+}
+
+.liquid-blob-3 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(var(--accent-rgb), 0.4) 0%, transparent 70%);
+  bottom: 10%;
+  left: 20%;
+  animation-delay: -16s;
+}
+
+@keyframes liquidMove {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  25% {
+    transform: translate(50px, -30px) scale(1.1) rotate(5deg);
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+  50% {
+    transform: translate(-30px, 50px) scale(0.95) rotate(-5deg);
+    border-radius: 50% 60% 30% 60% / 30% 40% 70% 60%;
+  }
+  75% {
+    transform: translate(30px, 30px) scale(1.05) rotate(3deg);
+    border-radius: 40% 50% 60% 50% / 60% 40% 50% 40%;
+  }
 }
