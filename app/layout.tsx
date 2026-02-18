@@ -151,10 +151,11 @@ function HeaderSkeleton() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-transparent backdrop-blur-md border-b border-white/5 dark:border-white/5">
       <div className="px-3 sm:px-4 h-16 flex items-center justify-between max-w-[1400px] mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-muted animate-pulse" />
-          <div className="h-6 w-20 bg-muted rounded animate-pulse" />
+        {/* Logo skeleton - matches 160x40 (md size) proportions */}
+        <div className="flex items-center">
+          <div className="w-[160px] h-[40px] bg-muted rounded animate-pulse" />
         </div>
+        {/* Sign In button skeleton */}
         <div className="h-9 w-24 bg-muted rounded-lg animate-pulse" />
       </div>
     </header>
