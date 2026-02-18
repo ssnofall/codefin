@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Card } from './components/ui/Card';
-import { APP_NAME } from './lib/utils/constants';
+import { Logo } from './components/ui/Logo';
 
 export default function ErrorBoundary({
   error,
@@ -77,9 +77,9 @@ export default function ErrorBoundary({
           </div>
 
           {/* Footer */}
-          <p className="text-sm text-muted-foreground">
-            {APP_NAME} - Share Code. Get Seen.
-          </p>
+          <div className="flex justify-center">
+            <Logo size="sm" />
+          </div>
         </div>
       </Card>
     </div>
