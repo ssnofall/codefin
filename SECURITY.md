@@ -8,12 +8,12 @@
 
 ## Reporting a Vulnerability
 
-We take security seriously at Stackd. If you discover a security vulnerability, we appreciate your help in disclosing it to us in a responsible manner.
+We take security seriously at Codefin. If you discover a security vulnerability, we appreciate your help in disclosing it to us in a responsible manner.
 
 ### Reporting Process
 
 1. **Do Not** open public issues on GitHub for security vulnerabilities
-2. Email us at **security@stackd.app** with details about the vulnerability
+2. Email us at **ssnofall@proton.me** with details about the vulnerability
 3. Include the following information:
    - Description of the vulnerability
    - Steps to reproduce (if applicable)
@@ -44,7 +44,7 @@ We follow responsible disclosure practices:
 
 ## Security Measures
 
-Stackd implements the following security measures:
+Codefin implements the following security measures:
 
 ### Authentication & Authorization
 - GitHub OAuth via Supabase Auth
@@ -99,8 +99,7 @@ We currently do not offer a bug bounty program, but we greatly appreciate securi
 
 ## Security Contacts
 
-- **Email**: security@stackd.app
-- **Security.txt**: https://stackd.app/.well-known/security.txt
+- **Email**: ssnofall@proton.me
 
 ## Hall of Fame
 

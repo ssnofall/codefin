@@ -1,6 +1,6 @@
-# Stackd - Deployment Guide
+# Codefin - Deployment Guide
 
-Complete guide for deploying Stackd to production on Vercel with full security hardening.
+Complete guide for deploying Codefin to production on Vercel with full security hardening.
 
 ## Prerequisites
 
@@ -70,7 +70,7 @@ UPSTASH_REDIS_REST_TOKEN=your-redis-token
    - Go to GitHub > Settings > Developer Settings > OAuth Apps
    - Click "New OAuth App"
    - Fill in:
-     - **Application name**: Stackd
+      - **Application name**: Codefin
      - **Homepage URL**: https://your-domain.com
      - **Authorization callback URL**: https://your-domain.com/auth/callback
    - Click "Register application"
@@ -286,4 +286,4 @@ If you encounter issues:
 ---
 
 **Last Updated**: 2026-02-16  
-**Stackd Version**: 1.0.0
+**Codefin Version**: 1.0.0

@@ -1,4 +1,4 @@
-# Stackd
+# Codefin
 
 Share Code. Get Seen.
 
@@ -37,7 +37,7 @@ A modern platform for developers to share code snippets, get feedback, and build
 ## Project Structure
 
 ```
-stackd/
+codefin/
 ├── app/
 │   ├── auth/                  # Authentication routes
 │   │   ├── callback/          # OAuth callback handler
@@ -88,8 +88,8 @@ stackd/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/stackd.git
-cd stackd
+git clone https://github.com/yourusername/codefin.git
+cd codefin
 ```
 
 ### 2. Install Dependencies
@@ -160,7 +160,7 @@ SELECT tablename FROM pg_tables WHERE schemaname = 'public';
 
 1. Go to GitHub > Settings > Developer Settings > OAuth Apps > New OAuth App
 2. Fill in:
-   - Application name: Stackd (or your app name)
+    - Application name: Codefin (or your app name)
    - Homepage URL: `http://localhost:3000`
    - Authorization callback URL: `http://localhost:3000/auth/callback`
 3. Click "Register application"
@@ -328,7 +328,7 @@ npm run build
 
 ## Security Features
 
-Stackd implements comprehensive security measures for production deployment:
+Codefin implements comprehensive security measures for production deployment:
 
 ### Authentication & Authorization
 - ✅ **Row Level Security (RLS)** - All tables protected with granular policies

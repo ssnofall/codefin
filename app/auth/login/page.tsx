@@ -2,8 +2,8 @@ import { createClient } from '../../lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Card } from '../../components/ui/Card';
-import { APP_NAME } from '../../lib/utils/constants';
 import { Github } from 'lucide-react';
+import { Logo } from '../../components/ui/Logo';
 
 export default async function LoginPage() {
   const supabase = await createClient();
@@ -37,11 +37,9 @@ export default async function LoginPage() {
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center">
       <Card className="w-full max-w-md">
         <div className="text-center space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-              Welcome to {APP_NAME}
-            </h1>
-            <p className="text-muted-foreground mt-2">
+          <div className="flex flex-col items-center gap-4">
+            <Logo size="lg" />
+            <p className="text-muted-foreground">
               Share code. Get seen.
             </p>
           </div>

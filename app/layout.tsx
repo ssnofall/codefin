@@ -20,7 +20,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Stackd - Share Code. Get Seen.",
+  title: "Codefin - Share Code. Get Seen.",
   description: "Share code snippets and get discovered by the community",
 };
 
@@ -74,7 +74,7 @@ export default async function RootLayout({
             __html: `
               (function() {
                 // Check for stored theme preference
-                const stored = localStorage.getItem('stackd-theme');
+                const stored = localStorage.getItem('codefin-theme');
                 if (stored === 'dark') {
                   document.documentElement.classList.add('dark');
                 } else if (stored === 'light') {

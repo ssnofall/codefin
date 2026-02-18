@@ -15,8 +15,8 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const THEME_STORAGE_KEY = 'stackd-theme';
-const ACCENT_COLOR_STORAGE_KEY = 'stackd-accent-color';
+const THEME_STORAGE_KEY = 'codefin-theme';
+const ACCENT_COLOR_STORAGE_KEY = 'codefin-accent-color';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('light');

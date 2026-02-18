@@ -33,7 +33,7 @@ export function Footer() {
 
           {/* Brand */}
           <div className="text-sm text-muted-foreground">
-            &copy; 2026 Stackd. All rights reserved.
+            &copy; 2026 Codefin. All rights reserved.
           </div>
         </div>
       </div>

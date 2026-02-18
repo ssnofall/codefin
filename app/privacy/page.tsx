@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Card } from "../components/ui/Card";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - Stackd",
-  description: "Learn how Stackd collects, uses, and protects your data.",
+  title: "Privacy Policy - Codefin",
+  description: "Learn how Codefin collects, uses, and protects your data.",
 };
 
 export default function PrivacyPage() {
@@ -18,7 +18,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">Introduction</h2>
           <p className="text-muted-foreground leading-relaxed">
-            This Privacy Policy explains how Stackd collects, uses, and protects your personal information. 
+            This Privacy Policy explains how Codefin collects, uses, and protects your personal information.
             We are committed to protecting your privacy and being transparent about our data practices.
           </p>
         </section>
@@ -161,8 +161,8 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">Children&apos;s Privacy</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Stackd is not intended for users under 13 years of age. We do not knowingly collect 
-            personal information from children under 13. If you believe we have collected information 
+            Codefin is not intended for users under 13 years of age. We do not knowingly collect
+            personal information from children under 13. If you believe we have collected information
             from a child under 13, please contact us immediately.
           </p>
         </section>
@@ -172,7 +172,7 @@ export default function PrivacyPage() {
           <p className="text-muted-foreground leading-relaxed">
             We may update this Privacy Policy from time to time. We will notify users of significant 
             changes by updating the &quot;Last updated&quot; date at the top of this page. Continued use of 
-            Stackd after changes constitutes acceptance of the updated policy.
+            Codefin after changes constitutes acceptance of the updated policy.
           </p>
         </section>
 

@@ -122,7 +122,7 @@ export function SettingsClient({ user, profile }: SettingsClientProps) {
         <div>
           <h2 className="text-lg font-semibold">Appearance</h2>
           <p className="text-sm text-muted-foreground">
-            Customize how Stackd looks for you.
+            Customize how Codefin looks for you.
           </p>
         </div>
 
@@ -200,7 +200,7 @@ export function SettingsClient({ user, profile }: SettingsClientProps) {
             <div className="flex-1">
               <h3 className="font-medium text-destructive">Delete Account</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Permanently delete your Stackd account and all associated data including your posts, 
+                Permanently delete your Codefin account and all associated data including your posts,
                 comments, and votes. This action cannot be undone.
               </p>
               <button
