@@ -1,58 +1,58 @@
 'use client';
 
-import { APP_NAME } from '../../lib/utils/constants';
+import { useTheme } from '../theme/ThemeProvider';
+import Image from 'next/image';
 
 interface LogoProps {
-  showText?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  enableGlow?: boolean;
 }
 
-export function Logo({ showText = true, size = 'md', className = '' }: LogoProps) {
-  const sizeClasses = {
-    sm: { container: 'w-6 h-6', text: 'text-lg', stroke: 2 },
-    md: { container: 'w-8 h-8', text: 'text-xl', stroke: 2 },
-    lg: { container: 'w-10 h-10', text: 'text-2xl', stroke: 2.5 },
+export function Logo({ size = 'md', className = '', enableGlow = true }: LogoProps) {
+  const { theme, accentColor } = useTheme();
+  
+  // Dynamic file paths based on theme and accent
+  const finSrc = `/fin-element-${accentColor}.svg`;
+  const textSrc = theme === 'dark' ? '/codefin-white-text.svg' : '/codefin-black-text.svg';
+  
+  // Size configurations
+  const sizeConfig = {
+    sm: { finSize: 24, textWidth: 84, textHeight: 18 },
+    md: { finSize: 32, textWidth: 112, textHeight: 24 },
+    lg: { finSize: 40, textWidth: 140, textHeight: 30 },
   };
 
-  const { container, text, stroke } = sizeClasses[size];
-
+  const { finSize, textWidth, textHeight } = sizeConfig[size];
+  
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      {/* Triangular Monoline Fin */}
-      <svg
-        className={`${container} text-primary`}
-        viewBox="0 0 32 32"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+    <div className={`flex items-center gap-1 ${className}`}>
+      {/* Fin element with hover glow */}
+      <div 
+        className={`
+          relative transition-all duration-300 ease-out cursor-pointer
+          ${enableGlow ? 'hover:[filter:drop-shadow(0_0_8px_var(--glow-accent))]' : ''}
+        `}
       >
-        {/* Monoline triangular fin - curved/flowing design */}
-        <path
-          d="M4 28 L16 4 L28 28 Z"
-          stroke="currentColor"
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
+        <Image 
+          src={finSrc} 
+          alt="" 
+          width={finSize} 
+          height={finSize}
+          className="transition-transform duration-200 hover:scale-105"
+          priority
         />
-        {/* Inner accent line for depth */}
-        <path
-          d="M10 24 L16 12 L22 24"
-          stroke="currentColor"
-          strokeWidth={stroke * 0.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          opacity="0.6"
-        />
-      </svg>
-
-      {/* Text */}
-      {showText && (
-        <span className={`${text} font-bold text-foreground tracking-tight`}>
-          {APP_NAME}
-        </span>
-      )}
+      </div>
+      
+      {/* Text element */}
+      <Image 
+        src={textSrc} 
+        alt="Codefin" 
+        width={textWidth}
+        height={textHeight}
+        className="transition-opacity duration-200"
+        priority
+      />
     </div>
   );
 }
