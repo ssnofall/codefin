@@ -1,5 +1,5 @@
 // App constants - abstracted for easy renaming
-export const APP_NAME = 'Stackd'
+export const APP_NAME = 'Codefin'
 export const SCORE_LABEL = 'Score'
 
 // Navigation items

@@ -3,8 +3,8 @@ import { createClient } from '../lib/supabase/server';
 import { SettingsClient } from './SettingsClient';
 
 export const metadata = {
-  title: 'Settings - Stackd',
-  description: 'Manage your Stackd account settings',
+  title: 'Settings - Codefin',
+  description: 'Manage your Codefin account settings',
 };
 
 export default async function SettingsPage() {

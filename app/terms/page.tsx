@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Card } from "../components/ui/Card";
 
 export const metadata: Metadata = {
-  title: "Terms of Service - Stackd",
-  description: "Terms of Service for Stackd - the code sharing platform.",
+  title: "Terms of Service - Codefin",
+  description: "Terms of Service for Codefin - the code sharing platform.",
 };
 
 export default function TermsPage() {
@@ -18,7 +18,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">1. Acceptance of Terms</h2>
           <p className="text-muted-foreground leading-relaxed">
-            By accessing or using Stackd, you agree to be bound by these Terms of Service. 
+            By accessing or using Codefin, you agree to be bound by these Terms of Service.
             If you do not agree to these terms, please do not use our service.
           </p>
         </section>
@@ -26,16 +26,16 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">2. Eligibility</h2>
           <p className="text-muted-foreground leading-relaxed">
-            You must be at least 13 years old to use Stackd, in compliance with GitHub&apos;s Terms of Service 
-            which we use for authentication. By using Stackd, you represent that you meet this age requirement.
+            You must be at least 13 years old to use Codefin, in compliance with GitHub&apos;s Terms of Service
+            which we use for authentication. By using Codefin, you represent that you meet this age requirement.
           </p>
         </section>
 
         <section>
           <h2 className="text-lg font-semibold mb-3">3. Accounts</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Stackd uses GitHub OAuth for authentication. You are responsible for maintaining the security 
-            of your GitHub account. We reserve the right to suspend or terminate accounts that violate these terms 
+            Codefin uses GitHub OAuth for authentication. You are responsible for maintaining the security
+            of your GitHub account. We reserve the right to suspend or terminate accounts that violate these terms
             or engage in prohibited activities.
           </p>
         </section>
@@ -43,7 +43,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">4. Content Guidelines</h2>
           <p className="text-muted-foreground leading-relaxed mb-3">
-            When posting content on Stackd, you agree not to share:
+            When posting content on Codefin, you agree not to share:
           </p>
           <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
             <li>Hate speech, harassment, or discriminatory content</li>
@@ -58,8 +58,8 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">5. Your Content</h2>
           <p className="text-muted-foreground leading-relaxed">
-            You retain ownership of the code and content you post on Stackd. By posting content, 
-            you grant us a non-exclusive license to display, store, and distribute your content 
+            You retain ownership of the code and content you post on Codefin. By posting content,
+            you grant us a non-exclusive license to display, store, and distribute your content
             on the platform. You can delete your content at any time through your account settings.
           </p>
         </section>
@@ -89,7 +89,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">8. Termination</h2>
           <p className="text-muted-foreground leading-relaxed">
-            We reserve the right to suspend or terminate your access to Stackd at our discretion, 
+            We reserve the right to suspend or terminate your access to Codefin at our discretion,
             particularly for violations of these terms. You may also delete your account at any time.
           </p>
         </section>
@@ -97,7 +97,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">9. Disclaimer of Warranties</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Stackd is provided &quot;as is&quot; without warranties of any kind, either express or implied. 
+            Codefin is provided &quot;as is&quot; without warranties of any kind, either express or implied.
             We do not guarantee that the service will be uninterrupted, secure, or error-free.
           </p>
         </section>
@@ -105,8 +105,8 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold mb-3">10. Limitation of Liability</h2>
           <p className="text-muted-foreground leading-relaxed">
-            To the maximum extent permitted by law, Stackd and its developer shall not be liable 
-            for any indirect, incidental, special, consequential, or punitive damages arising from 
+            To the maximum extent permitted by law, Codefin and its developer shall not be liable
+            for any indirect, incidental, special, consequential, or punitive damages arising from
             your use of the service.
           </p>
         </section>

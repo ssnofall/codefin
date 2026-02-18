@@ -6,7 +6,7 @@ import { LanguageProgressBar } from '../components/ui/LanguageProgressBar';
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Discover - Stackd',
+  title: 'Discover - Codefin',
   description: 'Explore trending topics, platform stats, and popular programming languages',
 };
 
