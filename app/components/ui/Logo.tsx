@@ -12,45 +12,34 @@ interface LogoProps {
 export function Logo({ size = 'md', className = '', enableGlow = true }: LogoProps) {
   const { theme, accentColor } = useTheme();
   
-  // Dynamic file paths based on theme and accent
-  const finSrc = `/fin-element-${accentColor}.svg`;
-  const textSrc = theme === 'dark' ? '/codefin-white-text.svg' : '/codefin-black-text.svg';
+  // Dynamic file path based on theme and accent
+  // Format: codefin-{text-color}-text-{accent-color}-fin.svg
+  const textColor = theme === 'dark' ? 'white' : 'black';
+  const logoSrc = `/codefin-${textColor}-text-${accentColor}-fin.svg`;
   
-  // Size configurations
+  // Size configurations (4:1 aspect ratio)
   const sizeConfig = {
-    sm: { finSize: 24, textWidth: 84, textHeight: 18 },
-    md: { finSize: 32, textWidth: 112, textHeight: 24 },
-    lg: { finSize: 40, textWidth: 140, textHeight: 30 },
+    sm: { width: 120, height: 30 },
+    md: { width: 160, height: 40 },
+    lg: { width: 200, height: 50 },
   };
 
-  const { finSize, textWidth, textHeight } = sizeConfig[size];
+  const { width, height } = sizeConfig[size];
   
   return (
-    <div className={`flex items-center gap-1 ${className}`}>
-      {/* Fin element with hover glow */}
-      <div 
-        className={`
-          relative transition-all duration-300 ease-out cursor-pointer
-          ${enableGlow ? 'hover:[filter:drop-shadow(0_0_8px_var(--glow-accent))]' : ''}
-        `}
-      >
-        <Image 
-          src={finSrc} 
-          alt="" 
-          width={finSize} 
-          height={finSize}
-          className="transition-transform duration-200 hover:scale-105"
-          priority
-        />
-      </div>
-      
-      {/* Text element */}
+    <div 
+      className={`
+        relative transition-all duration-300 ease-out
+        ${enableGlow ? 'hover:[filter:drop-shadow(0_0_12px_var(--glow-accent))]' : ''}
+        ${className}
+      `}
+    >
       <Image 
-        src={textSrc} 
+        src={logoSrc} 
         alt="Codefin" 
-        width={textWidth}
-        height={textHeight}
-        className="transition-opacity duration-200"
+        width={width}
+        height={height}
+        className="transition-transform duration-200 hover:scale-105"
         priority
       />
     </div>
