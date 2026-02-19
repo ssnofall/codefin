@@ -136,4 +136,4 @@ Codefin implements comprehensive security measures for production deployment:
 
 ## License
 
-This project is licensed under the GNU Affero General Public License
+  This project is licensed under the GNU Affero General Public License
