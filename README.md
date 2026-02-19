@@ -171,20 +171,7 @@ SELECT tablename FROM pg_tables WHERE schemaname = 'public';
 8. Paste in your Client ID and Client Secret
 9. Save
 
-### 7. Enable Password Security (Recommended)
-
-Enable leaked password protection to prevent users from using compromised passwords:
-
-1. Go to Supabase Dashboard > Authentication > Providers > Email
-2. Enable **"Enable leaked credentials protection"**
-3. Save
-
-Alternatively, use the Supabase CLI:
-```bash
-supabase auth password-leaked-protection enable
-```
-
-### 8. Run Development Server
+### 7. Run Development Server
 
 ```bash
 npm run dev
@@ -192,7 +179,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-### 9. Verify Everything Works
+### 8. Verify Everything Works
 
 1. Click "Sign In" and authenticate with GitHub
 2. Create a test post with tags
@@ -445,10 +432,6 @@ The following security measures are already in place:
 4. Run tests: `npm run test` (if available)
 5. Submit a pull request
 
-## License
-
-MIT License - feel free to use this for personal or commercial projects.
-
 ## Support
 
 If you encounter issues:
@@ -461,7 +444,3 @@ If you encounter issues:
    - `04_service_role_permissions.sql` - Service role permissions
 3. Check browser console and server logs
 4. Open an issue on GitHub
-
----
-
-**Built with ❤️ using Next.js, Supabase, and TailwindCSS**
