@@ -70,19 +70,6 @@ Codefin implements the following security measures:
 - No secrets in code (all via environment variables)
 - Error message sanitization (no internal details leaked)
 
-## Security Checklist for Deployment
-
-Before deploying to production, ensure:
-
-- [ ] All environment variables are set
-- [ ] Supabase keys are rotated and secure
-- [ ] Upstash Redis is configured for rate limiting
-- [ ] GitHub OAuth callback URL is correct
-- [ ] RLS policies are applied in Supabase
-- [ ] Database functions and triggers are created
-- [ ] Domain has SSL/TLS certificate
-- [ ] Security headers are being sent (verify with securityheaders.com)
-
 ## Bug Bounty Program
 
 We currently do not offer a bug bounty program, but we greatly appreciate security researchers who report vulnerabilities responsibly. We will:
@@ -99,7 +86,7 @@ We currently do not offer a bug bounty program, but we greatly appreciate securi
 
 We thank the following security researchers for their responsible disclosures:
 
-*No vulnerabilities have been reported yet. Be the first!*
+*No vulnerabilities have been reported yet.*
 
 ---
 
