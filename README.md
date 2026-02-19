@@ -114,10 +114,6 @@ Codefin implements comprehensive security measures for production deployment:
 - ✅ **SQL Injection Prevention** - Parameterized queries via Supabase
 - ✅ **CSRF Protection** - SameSite cookies and request validation
 
-### Monitoring
-- ✅ **Security.txt** - Standard security contact information
-- ✅ **SECURITY.md** - Vulnerability reporting process
-
 ## Performance Features
 
 - Client-side aggregation for trending tags
