@@ -80,7 +80,7 @@ Codefin implements the following security measures:
 
 Before deploying to production, ensure:
 
-- [ ] All environment variables are set (see `.env.example`)
+- [ ] All environment variables are set
 - [ ] Supabase keys are rotated and secure
 - [ ] Upstash Redis is configured for rate limiting
 - [ ] GitHub OAuth callback URL is correct
