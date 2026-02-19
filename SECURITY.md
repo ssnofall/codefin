@@ -1,11 +1,5 @@
 # Security Policy
 
-## Supported Versions
-
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x.x   | :white_check_mark: |
-
 ## Reporting a Vulnerability
 
 We take security seriously at Codefin. If you discover a security vulnerability, we appreciate your help in disclosing it to us in a responsible manner.
