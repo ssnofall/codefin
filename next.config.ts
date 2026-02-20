@@ -1,4 +1,68 @@
 import type { NextConfig } from "next";
+const withPWA = require("next-pwa")({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+  runtimeCaching: [
+    {
+      urlPattern: /^https?.*/,
+      handler: "NetworkFirst",
+      options: {
+        cacheName: "offlineCache",
+        expiration: {
+          maxEntries: 200,
+          maxAgeSeconds: 24 * 60 * 60,
+        },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
+        networkTimeoutSeconds: 10,
+      },
+    },
+    {
+      urlPattern: /\/_next\/static\/.*/i,
+      handler: "CacheFirst",
+      options: {
+        cacheName: "static-cache",
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 60 * 60 * 24 * 30,
+        },
+      },
+    },
+    {
+      urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
+      handler: "CacheFirst",
+      options: {
+        cacheName: "image-cache",
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 60 * 60 * 24 * 30,
+        },
+      },
+    },
+    {
+      urlPattern: /\/api\/.*/i,
+      handler: "NetworkOnly",
+      options: {
+        cacheName: "api-cache",
+      },
+    },
+    {
+      urlPattern: /\/auth\/.*/i,
+      handler: "NetworkOnly",
+      options: {
+        cacheName: "auth-cache",
+      },
+    },
+    {
+      urlPattern: /supabase.*/i,
+      handler: "NetworkOnly",
+      options: {
+        cacheName: "supabase-cache",
+      },
+    },
+  ],
+});
 
 const nextConfig: NextConfig = {
   // Standard Vercel deployment configuration
@@ -42,4 +106,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);
