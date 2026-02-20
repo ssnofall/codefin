@@ -60,7 +60,7 @@ export function CodePreview({ code, language, fileName }: CodePreviewProps) {
   return (
     <div className="terminal-window rounded-2xl overflow-hidden">
       {/* IDE-style header */}
-      <div className="terminal-header flex items-center justify-between px-4 py-3">
+      <div className="terminal-header flex items-center justify-between px-4 py-1">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
           <div className="w-3 h-3 rounded-full bg-yellow-500/80 shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
