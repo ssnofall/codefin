@@ -173,7 +173,7 @@ export function SettingsClient({ user, profile }: SettingsClientProps) {
             <form action={logout}>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-colors font-medium"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-colors font-medium cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 Sign Out
@@ -205,7 +205,7 @@ export function SettingsClient({ user, profile }: SettingsClientProps) {
               </p>
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-destructive/30 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-destructive/30 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete Account
@@ -265,14 +265,14 @@ export function SettingsClient({ user, profile }: SettingsClientProps) {
                     setError(null);
                   }}
                   disabled={isDeleting}
-                  className="flex-1 px-4 py-2 rounded-lg border border-border hover:bg-accent transition-colors disabled:opacity-50"
+                  className="flex-1 px-4 py-2 rounded-lg border border-border hover:bg-accent transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteAccount}
                   disabled={isDeleting || deleteConfirmText !== 'DELETE'}
-                  className="flex-1 px-4 py-2 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {isDeleting ? 'Deleting...' : 'Delete Forever'}
                 </button>

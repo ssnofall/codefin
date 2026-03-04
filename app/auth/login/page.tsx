@@ -47,7 +47,7 @@ export default async function LoginPage() {
           <form action={signInWithGithub}>
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-white text-black font-medium hover:bg-white/90 transition-colors"
+              className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-white text-black font-medium hover:bg-white/90 transition-colors cursor-pointer"
             >
               <Github className="w-5 h-5" />
               Continue with GitHub
