@@ -33,7 +33,7 @@ export function PostMenu({ post, isOwner }: PostMenuProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
-            className="p-1.5 rounded-lg hover:bg-accent transition-colors"
+            className="p-1.5 rounded-lg hover:bg-accent transition-colors cursor-pointer"
             aria-label="Post options"
           >
             <MoreVertical className="w-4 h-4 text-muted-foreground" />

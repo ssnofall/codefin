@@ -15,7 +15,7 @@ export function SignInButton() {
     <Link href="/auth/login" onClick={handleClick}>
       <button 
         disabled={isPending}
-        className="relative group px-5 py-2 rounded-xl font-medium transition-all duration-300 btn-press overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed"
+        className="relative group px-5 py-2 rounded-xl font-medium transition-all duration-300 btn-press overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
       >
         {/* Animated liquid glass border */}
         <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-[var(--accent)] via-[var(--primary)] via-[var(--accent)] to-[var(--primary)] animate-liquid-border-glass bg-[length:300%_100%] opacity-90" />
