@@ -27,7 +27,7 @@ export function Header({ user }: HeaderProps) {
             <>
               <Link
                 href="/settings"
-                className="p-2.5 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 transition-colors"
+                className="p-2.5 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 transition-colors cursor-pointer"
                 aria-label="Settings"
               >
                 <Settings className="w-5 h-5 text-muted-foreground" />
@@ -56,9 +56,9 @@ export function Header({ user }: HeaderProps) {
         {/* Mobile Settings Link (only when logged in) */}
         <div className="lg:hidden">
           {user ? (
-            <Link
+          <Link
               href="/settings"
-              className="p-2.5 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 transition-colors touch-target"
+              className="p-2.5 rounded-xl hover:bg-white/10 dark:hover:bg-white/10 transition-colors touch-target cursor-pointer"
               aria-label="Settings"
             >
               <Settings className="w-5 h-5 text-muted-foreground" />
