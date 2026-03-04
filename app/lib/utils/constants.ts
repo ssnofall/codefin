@@ -10,25 +10,32 @@ export const NAV_ITEMS = [
   { label: 'Top', href: '/top' },
 ] as const
 
-// Programming languages for dropdown
+// Programming languages for dropdown (alphabetical order)
 export const LANGUAGES = [
-  'JavaScript',
-  'TypeScript',
-  'Python',
-  'Go',
-  'Rust',
-  'Java',
-  'C++',
   'C#',
-  'Ruby',
-  'PHP',
-  'Swift',
-  'Kotlin',
-  'HTML',
+  'C++',
   'CSS',
-  'SQL',
-  'Shell',
+  'Dart',
+  'Elixir',
+  'Go',
+  'HTML',
+  'Java',
+  'JavaScript',
+  'JSON',
+  'Kotlin',
+  'Markdown',
   'Other',
+  'PHP',
+  'PowerShell',
+  'Python',
+  'Ruby',
+  'Rust',
+  'Shell',
+  'SQL',
+  'Solidity',
+  'Swift',
+  'TypeScript',
+  'Zig',
 ] as const
 
 // Post limits
@@ -83,6 +90,13 @@ export const LANGUAGE_COLORS: Record<string, string> = {
   css: 'bg-purple-700/10 text-purple-700 border-purple-700/20',
   sql: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
   shell: 'bg-green-400/10 text-green-500 border-green-400/20',
+  dart: 'bg-[#00B4AB]/10 text-[#00B4AB] border-[#00B4AB]/20',
+  elixir: 'bg-[#6e4a7e]/10 text-[#6e4a7e] border-[#6e4a7e]/20',
+  json: 'bg-[#292929]/10 text-[#292929] border-[#292929]/20',
+  markdown: 'bg-[#083fa1]/10 text-[#083fa1] border-[#083fa1]/20',
+  powershell: 'bg-[#012456]/10 text-[#012456] border-[#012456]/20',
+  solidity: 'bg-[#AA6746]/10 text-[#AA6746] border-[#AA6746]/20',
+  zig: 'bg-[#ec915c]/10 text-[#ec915c] border-[#ec915c]/20',
   other: 'bg-muted text-muted-foreground border-border',
 }
 
